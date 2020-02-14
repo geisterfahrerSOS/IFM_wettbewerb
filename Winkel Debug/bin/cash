@@ -1,0 +1,249 @@
+#include <Arduino.h> //include Arduino.h library
+#include <Wire.h>    //include Wire.h library
+#include <Servo.h>
+
+#define SDA 4
+#define SCL 5
+#define ADDRESS1 0x1D //LSM303D Ultra compact high performance e-Compass \ 0x1E wenn SAO mit ground verbunden wird \3D accelerometer and 3D magnetometer module
+#define ADDRESS2 0x6B //L3GD20H MEMS motion sensor: three-axis digital output gyroscope
+#define OUT_X_L_M 0x08
+#define OUT_X_H_M 0x09
+#define OUT_Y_L_M 0x0A
+#define OUT_Y_H_M 0x0B
+#define OUT_Z_L_M 0x0C
+#define OUT_Z_H_M 0x0D
+#define WHO_AM_I 0x0F
+#define INT_CTRL_M 0x12
+#define STATUS_M 0x07
+#define CTRL5 0x24
+#define TEMP_ON 0x80
+#define TEMP_OFF 0x00
+#define TEMP_OUT_L 0x05
+#define TEMP_OUT_H 0x06
+#define ZERO_32 0x00000000
+#define OUT_X_L_A 0x28
+#define OUT_X_H_A 0x29
+#define OUT_Y_L_A 0x2A
+#define OUT_X_H_A 0x2B
+#define OUT_Z_L_A 0x2C
+#define OUT_Z_H_A 0x2D
+#define CTRL2 0x21
+#define CTRL6 0x25
+#define CTRL7 0x26
+const int runaverage = 10;
+float magnet[3];
+boolean debug = false;
+float headingDegrees, headingFiltered;
+float averageDegrees[runaverage];
+float servoDegrees;
+int pos = 0;
+boolean state=false;
+Servo myservo;
+char data[4];
+
+extern byte chipRead(uint8_t add, uint8_t reg);
+extern void chipWrite(uint8_t add, uint8_t reg, uint8_t data);
+extern uint16_t read12bit(uint8_t add, byte regh, byte regl);
+extern float calc(float mag);
+extern float average();
+extern void bitShift();
+extern int blanks();
+extern float average();
+extern uint8_t twocompl8(uint8_t wert);
+extern void read();
+
+void setup()
+{
+  Serial.begin(9600);
+  Wire.begin();
+  chipWrite(ADDRESS1, CTRL7, 0x0);
+  myservo.attach(3);
+  pinMode(2,INPUT_PULLUP);
+}
+void loop()
+{
+while(digitalRead(2)==0)
+{
+}
+  if (state == false)
+  {
+    pos++;
+  }
+  else
+  {
+    pos--;
+  }
+  if (pos == 180)
+  {
+    state = true;
+  }
+  if (pos == 0)
+  {
+    state = false;
+  }
+  delay(100);
+  myservo.write(pos);
+  read();
+  Serial.print("S");
+  sprintf(data,"%03d",pos);
+  Serial.print(data);
+  Serial.print(",");
+  
+}
+void read()
+{
+  magnet[0] = read12bit(ADDRESS1, OUT_X_H_M, OUT_X_L_M);
+  magnet[1] = read12bit(ADDRESS1, OUT_Y_H_M, OUT_Y_L_M);
+  magnet[2] = read12bit(ADDRESS1, OUT_Z_H_M, OUT_Z_L_M);
+
+  headingDegrees = 360 - (atan2(calc(magnet[0]), calc(magnet[1])) + 0.052) * 180 / PI;
+  servoDegrees = 360 - (atan2(calc(magnet[0]), calc(magnet[1])) + 0.052) * 180 / PI + random(-10, 10);
+  if (headingDegrees < 0)
+  {
+    headingDegrees += 360;
+  }
+  if (headingDegrees > 360)
+  {
+    headingDegrees -= 360;
+  }
+  if (servoDegrees < 0)
+  {
+    servoDegrees += 360;
+  }
+  if (servoDegrees > 360)
+  {
+    servoDegrees -= 360;
+  }
+
+  //headingFiltered = average()*0.85 + headingDegrees*0.15;
+
+  //bitShift();
+  Serial.print("W");
+  Serial.print(headingDegrees);
+  Serial.println(",");
+  //Serial.println(average());
+}
+void bitShift()
+{
+
+  for (int i = 0; i < runaverage - 1; i++)
+  {
+    averageDegrees[i] = averageDegrees[i + 1];
+  }
+  averageDegrees[runaverage - 1] = headingDegrees;
+}
+float average()
+{
+  float total;
+  for (int i = 0; i < runaverage; i++)
+  {
+    total += averageDegrees[i];
+  }
+  return total / (runaverage - blanks());
+}
+int blanks()
+{
+  int amount;
+  for (int i = 0; i < runaverage; i++)
+  {
+    if (averageDegrees[i] == __null)
+    {
+      amount++;
+    }
+  }
+  return amount;
+}
+float calc(float mag)
+{
+  float magnetCalc = 0;
+
+  if (mag > 32768)
+  {
+    magnetCalc = (mag - 65536);
+  }
+  else
+  {
+    magnetCalc = mag;
+  }
+  return magnetCalc;
+}
+uint8_t twocompl8(uint8_t wert)
+{
+  wert -= 1;
+  wert = ~wert;
+  return wert;
+}
+void chipWrite(uint8_t add, uint8_t reg, uint8_t data)
+{
+  Wire.beginTransmission(add);
+  Wire.write(reg);
+  Wire.write(data);
+  Wire.endTransmission();
+}
+
+byte chipRead(uint8_t add, uint8_t reg)
+{
+
+  Wire.beginTransmission(add);
+  Wire.write(reg);
+  Wire.endTransmission();
+
+  Wire.requestFrom(ADDRESS1, 1);
+  while (!Wire.available())
+  {
+  }
+  return Wire.read();
+}
+
+uint16_t read12bit(uint8_t add, byte regh, byte regl)
+{
+  uint8_t low;
+  uint8_t high;
+  uint16_t readWert;
+
+  Wire.beginTransmission(add);
+  Wire.write(byte(regh));
+  Wire.endTransmission();
+
+  Wire.requestFrom(add, 1);
+  while (!Wire.available())
+  {
+  }
+
+  high = Wire.read();
+  readWert = high;
+  readWert = readWert << 8;
+  if (debug)
+  {
+    Serial.println("upper 8 bit");
+    Serial.println(high, BIN);
+    Serial.println("upper 8 bit compl");
+    Serial.println(twocompl8(high), BIN);
+  }
+
+  Wire.beginTransmission(add);
+  Wire.write(byte(regl));
+  Wire.endTransmission();
+
+  Wire.requestFrom(add, 1);
+  while (!Wire.available())
+  {
+  }
+  low = Wire.read();
+  if (debug)
+  {
+    Serial.println("lower 8 bit");
+    Serial.println(low, BIN);
+    Serial.println("lower 8 bit compl");
+    Serial.println(twocompl8(low), BIN);
+  }
+  readWert |= low;
+  //readWert=readWert>>4;
+
+  if (debug)
+  {
+    Serial.println("16 bit");
+    Serial.println(readWert, BIN);
+  }
+  return readWert;
+}
