@@ -1,5 +1,15 @@
-
-
+Initialisieren durch:
+setup(){
+  Winkel test = Winkel();
+}
+Ausgabe durch:
+void loop(){
+  float wert;
+  wert = test.winkel();
+  println(wert);
+}
+test ist dabei dass ertellte Objekt
+-------------------------------------------------------------------------------
 This directory is intended for project specific (private) libraries.
 PlatformIO will compile them to static libraries and link into executable file.
 
