@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>    //include Wire.h library
-#include "Blink.h"
+#include "Kompass.h"
 
 #define ADDRESS1 0x1D //LSM303D Ultra compact high performance e-Compass \ 0x1E wenn SAO mit ground verbunden wird \3D accelerometer and 3D magnetometer module
 #define ADDRESS2 0x6B //L3GD20H MEMS motion sensor: three-axis digital output gyroscope

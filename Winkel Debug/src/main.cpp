@@ -1,6 +1,6 @@
 #include <Arduino.h> //include Arduino.h library
 
-#include "Blink.h"
+#include "Kompass.h"
 
 Winkel test = Winkel();
 

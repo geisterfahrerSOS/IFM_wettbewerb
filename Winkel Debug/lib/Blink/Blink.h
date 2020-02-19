@@ -1,5 +1,5 @@
-#ifndef Blink_h
-#define Blink_h
+#ifndef Kompass_h
+#define Kompass_h
  
 #include <Arduino.h>
 class Winkel
