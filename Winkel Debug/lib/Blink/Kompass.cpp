@@ -21,6 +21,7 @@ void Winkel::startup()
 
     Wire.begin();
     chipWrite(ADDRESS1, CTRL7, 0x0);
+    Serial.begin(9600);
 }
 float Winkel::winkel()
 {
@@ -37,6 +38,7 @@ float Winkel::winkel()
     {
         headingDegrees -= 360;
     }
+    Serial,println("MOISSS");
     return headingDegrees;
 }
 
