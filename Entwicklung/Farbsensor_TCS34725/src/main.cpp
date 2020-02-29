@@ -68,11 +68,10 @@ SLEEP --> I2C Start --> IDLE --> Power Managment Feture enabled && RGBC Feture e
                              --> !Power Managment Feture enabled && RGBC Feture enabled? --> RGBC Init --> RGBC ADC --> IDLE --> !PON?? --> SLEEP
                                                                                                                              --> PON?? --> IDLE  
 */
-long integrationTime = GAIN_4x;
-long aGain = INTEG_CYCLE_10;
+int integrationTime = GAIN_4x;
+int aGain = INTEG_CYCLE_10;
 void setup() {
   Serial.begin(9600);
-  
   i2c = I2C(0x00);
   //POWER ON
   i2c.chipWrite(PON, COMMAND_BIT | ENABLE);
@@ -111,7 +110,7 @@ void loop() {
     while(result ==1);
     i2c.chipWrite(NAEN, COMMAND_BIT | ENABLE);
   }
-  switch(ATIME)
+  switch(integrationTime)
   {
     case INTEG_CYCLE_1:
       maxVal = 1024;

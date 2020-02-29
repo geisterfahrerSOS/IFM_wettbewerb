@@ -1,8 +1,10 @@
 #ifndef Fabrsensor_TCS34725
 #define Fabrsensor_TCS34725
+//https://cdn-shop.adafruit.com/datasheets/TCS34725.pdf
 #include <Arduino.h>
 #include <Wire.h>
 #include <I2C.h>
+#include <Farbe.h>
 
 #define COMMAND_BIT 0x80 // Typ der Übertragung
 
@@ -34,9 +36,6 @@
 #define GAIN_16x 0x10
 #define GAIN_60x 0x11
 #define STATUS 0x13
-/*
-BIT: 0 - RGBC Valid. Indicates that the RGBC channels have completed an integration cycle
-*/
 
 #define CDATAL 0x14 //Clear data low byte
 #define CDATAH 0x15 //Clear data high byte
@@ -46,11 +45,25 @@ BIT: 0 - RGBC Valid. Indicates that the RGBC channels have completed an integrat
 #define GDATAH 0x19 //Green data high byte
 #define BDATAL 0x1A //Blue data low byte
 #define BDATAH 0x1B //Blue data high byte
+
+/*
+BIT: 0 - RGBC Valid. Indicates that the RGBC channels have completed an integration cycle
+*/
 struct Farbsensor_TCS34725
 {
     public:
-
+        Farbsensor_TCS34725();
+        Farbsensor_TCS34725(uint8_t add, int led, uint8_t aGain, uint8_t integCycle);
+        Farbsensor_TCS34725(uint8_t add, int led, uint8_t wTime, bool wLong, uint8_t aGain, uint8_t integCycle);
+        void setIntegCycle(int integCycle);
+        void setAGain(int aGain);
+        void setWTime(int wTime);
+        void setWLong(bool wLong);
+        int farbeErkennen();
     private:
+        Farbe color;
         I2C i2c;
+        int WTime, aGain, integCycle, maxVal;
+        bool wLong;
 };
 #endif
