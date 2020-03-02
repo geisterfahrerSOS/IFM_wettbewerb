@@ -2,33 +2,39 @@
 
 void LineSensorOutput(float *pin0, float *pin1, float *pin2, float *pin3, float *pin4, float *pin5, float *pin6, float *pin7);
 //void LineSensorOutputArray(float *wert[total]);
-float linienOrt(int *input);
+float linienOrt(int *input, boolean fix); //data kommt rein aber sollte bei einem nicht wert nan oder der zuvorige Wert angenommen werden
 int anzahlAnWerte(int *array);
 int arraySumme(int *array);
 float drehCommand(float pos);
 void arrayFill(boolean trigger, float value, unsigned long time);
 boolean compareSet();
 void leftShift();
+void rightShift();
 void displayArray2D();
 void getData(boolean debug);
+void displayBuffer();
+void getDataUser(uint8_t userData); //von
 
-const int total = 6;
+const int total = 6; //man kann zwischen 6 bzw. acht Sensoren entscheiden
 
-int wert[total];
-int threshold = 500;     //ab wann wird die Dunkelheit als Linie gewertet
+int data[total];
+int threshold = 500; //ab wann wird die Dunkelheit als Linie gewertet
+
 int steerValueMain = 20; //Wie viel soll korrigiert werden//Soll nachher noch durch eine variable ersetzt werden
 int steerValueLeft = 1;  // verschiedene Steervalue je nach vorherigen werten
 int steervalueRight = 1;
 float centerPos = 0;       //wird im setup berechnet und gibt mittlere also gewünschte Fahrspur
 boolean steerMode = false; //kann man verändern je nach Sensor Positionierung;
-//float changeThreshold = 0.2; //Remember to implement__________________Wann wir arrayFill() ausgelöst
-float bufferArray[10][2]; //Buffer Array zum transport von shift Werten: 0: start (position in posValue Array); 1: stop (position in posValue Array);
+//float changeThreshold = 0.2; //Remember to implement__________________Wann wird arrayFill() ausgelöst
+
+boolean edit = true;
+float bufferArray[2][2]; //Buffer Array zum transport von shift Werten: 0: start (position in posValue Array); 1: stop (position in posValue Array);
 //Time not needed because saved in posValue
 float comparePos_1 = 0;
 float comparePos_2 = 0;
 boolean first_Compare = false;
 
-const int posValueLength = 5;
+const int posValueLength = 10;
 float posValue[posValueLength][2]; //array für Vergangenheitswerte damit man Aussagen über zukünftige Steeringinputs machen kann;
 
 void setup()
@@ -49,13 +55,14 @@ void setup()
 void loop()
 {
 
-  getData(false);
-  Serial.println("");
-  Serial.print("posValue:  ");
-  Serial.println(linienOrt(wert));
+  //getData(false);
+  getDataUser(0b00001101);
+  Serial.print("posValueLive:  ");
+  Serial.println(linienOrt(data, edit));
 
-  arrayFill(compareSet(), linienOrt(wert), millis());
-  displayArray2D();
+  //arrayFill(compareSet(), linienOrt(data, edit), millis()); //nur bei Änderungen wird das Array aufgefüllt
+  //displayArray2D();
+  //displayBuffer();
   // Serial.print("shiftStatus:  ");
   // Serial.println(compareSet());
 
@@ -66,24 +73,46 @@ void getData(boolean debug)
 {
   for (int i = 0; i < total; i++)
   {
+    data[i] = analogRead('\016' + i);
     if (debug)
     {
       Serial.print("Pin ");
       Serial.print(i);
-      Serial.print(" :  ");
+      Serial.print(":  ");
+      Serial.print(data[i]);
+      Serial.print("  ");
     }
-    wert[i] = analogRead('\016' + i);
-    if (debug)
+  }
+  Serial.println("");
+}
+
+void getDataUser(uint8_t userData)
+{
+
+  for (int i = total - 1; i >= 0; i--)
+  {
+
+    if ((userData &= int(pow(2, i))) > 0)
     {
-      Serial.print(wert[i]);
+      data[i] = 1024;
     }
+    else
+    {
+      data[i] = 0;
+    }
+
+    Serial.print("Pin ");
+    Serial.print(i);
+    Serial.print(":  ");
+    Serial.print(data[i]);
+    Serial.print("  ");
   }
 }
 
 boolean compareSet()
 {
   boolean shiftStatus = false;
-  comparePos_1 = linienOrt(wert);
+  comparePos_1 = linienOrt(data, edit);
   if (first_Compare && (comparePos_1 != comparePos_2))
   {
     shiftStatus = true;
@@ -97,8 +126,7 @@ boolean compareSet()
   return shiftStatus;
 }
 
-
-float linienOrt(int *input) //gibt Wert aus wo die Linie sich befindet
+float linienOrt(int *input, boolean fix) //gibt Wert aus wo die Linie sich befindet
 {
   float summe = 0;
   float j = 0;
@@ -114,6 +142,10 @@ float linienOrt(int *input) //gibt Wert aus wo die Linie sich befindet
   if (j != 0)
   {
     return summe / j;
+  }
+  else if (fix)
+  {
+    return posValue[posValueLength - 1][0];
   }
   else
   {
@@ -158,17 +190,52 @@ void arrayFill(boolean trigger, float value, unsigned long time)
       posValue[i][1] = posValue[i + 1][1];
     }
     posValue[posValueLength - 1][0] = value;
-    posValue[posValueLength - 1][1] = time;
+    posValue[posValueLength - 1][1] = time / 1000.0;
   }
 }
 
-void leftShift()
+void leftShift() //bedeutet man fährt zu sehr nach rechts also muss man sich nach links drehen
 {
-  //int start;
+  int start = 0;
+  int stop = -1;
   for (int i = posValueLength - 1; i >= 0; i--)
   {
     if (posValue[i] < posValue[i - 1])
     {
+      if (stop == -1)
+      {
+        start = i;
+      }
+      stop = i - 1;
+      bufferArray[0][0] = start;
+      bufferArray[0][1] = stop;
+    }
+    else
+    {
+      break;
+    }
+  }
+}
+
+void rightShift()
+{
+  int start = 0;
+  int stop = -1;
+  for (int i = posValueLength - 1; i >= 0; i--)
+  {
+    if (posValue[i] > posValue[i - 1])
+    {
+      if (stop == -1)
+      {
+        start = i;
+      }
+      stop = i - 1;
+      bufferArray[1][0] = start;
+      bufferArray[1][1] = stop;
+    }
+    else
+    {
+      break;
     }
   }
 }
@@ -181,6 +248,34 @@ void displayArray2D()
     Serial.print(posValue[i][0]);
     Serial.print("   time:  ");
     Serial.println(posValue[i][1]);
+  }
+}
+
+void displayBuffer()
+{
+  for (int i = 0; i < 2; i++)
+  {
+    for (int j = 0; j < 2; j++)
+    {
+      if (i == 0)
+      {
+        Serial.print("left | ");
+      }
+      else
+      {
+        Serial.print("right | ");
+      }
+      if (j == 0)
+      {
+        Serial.print("start:  ");
+      }
+      else
+      {
+        Serial.print("stop:  ");
+      }
+
+      Serial.println(bufferArray[i][j]);
+    }
   }
 }
 
