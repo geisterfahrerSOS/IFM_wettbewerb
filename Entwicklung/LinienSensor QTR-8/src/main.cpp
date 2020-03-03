@@ -47,6 +47,8 @@ boolean triggerListenL = false;
 boolean triggerListenR = false;
 boolean triggerListenS = false;
 
+long ST1 = 0;
+
 void setup()
 {
   // put your setup code here, to run once:
@@ -68,26 +70,27 @@ void setup()
 
 void loop()
 {
-
-  getData(true); //debug
-  Serial.print("posValueLive:  ");
-  Serial.println(linienOrt(data, edit));
-  arrayFill(compareSet(), linienOrt(data, edit), millis()); //nur bei Änderungen wird das Array aufgefüllt
-  displayArray2D();
-  Serial.print("triggerd Left");
-  Serial.println(triggerListenL);
-  Serial.print("triggerd right");
-  Serial.println(triggerListenR);
-  Serial.print("triggerd Stop");
-  Serial.println(triggerListenS);
-  changeDirection(!digitalRead(2), !digitalRead(3));
-  stopMovement(!digitalRead(4));
-  //drehCommand(linienOrt(data, edit))
-  //displayBuffer();
-  // Serial.print("shiftStatus:  ");
-  // Serial.println(compareSet());
-
-  delay(500);
+  if (millis() - ST1 > 500)
+  {
+    getData(true); //debug
+    Serial.print("posValueLive:  ");
+    Serial.println(linienOrt(data, edit));
+    arrayFill(compareSet(), linienOrt(data, edit), millis()); //nur bei Änderungen wird das Array aufgefüllt
+    displayArray2D();
+    Serial.print("triggerd Left");
+    Serial.println(triggerListenL);
+    Serial.print("triggerd right");
+    Serial.println(triggerListenR);
+    Serial.print("triggerd Stop");
+    Serial.println(triggerListenS);
+    changeDirection(!digitalRead(2), !digitalRead(3));
+    stopMovement(!digitalRead(4));
+    //drehCommand(linienOrt(data, edit))
+    //displayBuffer();
+    // Serial.print("shiftStatus:  ");
+    // Serial.println(compareSet());
+    ST1 = millis();
+  }
 }
 
 void getData(boolean debug)
