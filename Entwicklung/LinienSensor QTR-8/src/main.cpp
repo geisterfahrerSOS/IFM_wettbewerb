@@ -14,10 +14,16 @@ void displayArray2D();
 void getData(boolean debug);
 void displayBuffer();
 void getDataUser(uint8_t userData); //von
+boolean onLine(int *input);
+void lineSearch(int spinState);
+void changeDirection();
+void changeDirection(boolean triggerL, boolean triggerR);
+void actionChangeDirection(boolean dir);
+void stopMovement(boolean triggerS);
 
 const int total = 6; //man kann zwischen 6 bzw. acht Sensoren entscheiden
 
-int data[total];
+int data[total];     //die Sensor Werte werden in das Array eingefüllt
 int threshold = 500; //ab wann wird die Dunkelheit als Linie gewertet
 
 int steerValueMain = 20; //Wie viel soll korrigiert werden//Soll nachher noch durch eine variable ersetzt werden
@@ -27,7 +33,7 @@ float centerPos = 0;       //wird im setup berechnet und gibt mittlere also gew�
 boolean steerMode = false; //kann man verändern je nach Sensor Positionierung;
 //float changeThreshold = 0.2; //Remember to implement__________________Wann wird arrayFill() ausgelöst
 
-boolean edit = true;
+boolean edit = true;     //Sollen bei keinem Linien Messwert oder ein angepasster Wert ausgegeben werden
 float bufferArray[2][2]; //Buffer Array zum transport von shift Werten: 0: start (position in posValue Array); 1: stop (position in posValue Array);
 //Time not needed because saved in posValue
 float comparePos_1 = 0;
@@ -36,6 +42,10 @@ boolean first_Compare = false;
 
 const int posValueLength = 10;
 float posValue[posValueLength][2]; //array für Vergangenheitswerte damit man Aussagen über zukünftige Steeringinputs machen kann;
+
+boolean triggerListenL = false;
+boolean triggerListenR = false;
+boolean triggerListenS = false;
 
 void setup()
 {
@@ -46,6 +56,10 @@ void setup()
   {
     pinMode('\016' + i, INPUT_PULLUP);
   }
+  pinMode(2, INPUT_PULLUP);
+  pinMode(3, INPUT_PULLUP);
+  pinMode(4, INPUT_PULLUP);
+  posValue[posValueLength - 1][0] = 2.5;
 }
 //1. Idee: wenn sich der Wert von linienOrt verändert wird die Timestamp und die posValue abgespeichert, wie schnell und v.a. um wie viel sich der Wert ändert gibt an
 //wie sehr man wider zurücksteuern muss.
@@ -55,18 +69,25 @@ void setup()
 void loop()
 {
 
-  //getData(false);
-  getDataUser(0b00001101);
+  getData(true); //debug
   Serial.print("posValueLive:  ");
   Serial.println(linienOrt(data, edit));
-
-  //arrayFill(compareSet(), linienOrt(data, edit), millis()); //nur bei Änderungen wird das Array aufgefüllt
-  //displayArray2D();
+  arrayFill(compareSet(), linienOrt(data, edit), millis()); //nur bei Änderungen wird das Array aufgefüllt
+  displayArray2D();
+  Serial.print("triggerd Left");
+  Serial.println(triggerListenL);
+  Serial.print("triggerd right");
+  Serial.println(triggerListenR);
+  Serial.print("triggerd Stop");
+  Serial.println(triggerListenS);
+  changeDirection(!digitalRead(2), !digitalRead(3));
+  stopMovement(!digitalRead(4));
+  //drehCommand(linienOrt(data, edit))
   //displayBuffer();
   // Serial.print("shiftStatus:  ");
   // Serial.println(compareSet());
 
-  delay(2000);
+  delay(500);
 }
 
 void getData(boolean debug)
@@ -139,13 +160,34 @@ float linienOrt(int *input, boolean fix) //gibt Wert aus wo die Linie sich befin
       j++;
     }
   }
-  if (j != 0)
+  if ((j < 3) && (j > 0))
   {
     return summe / j;
   }
-  else if (fix)
+  else if (j > 2)
   {
     return posValue[posValueLength - 1][0];
+  }
+
+  else if (fix)
+  {
+
+    if ((posValue[posValueLength - 1][0] < 1)) //ab wann wird außen bei keiner Werterfassung der linienSucher getriggert
+    {
+      Serial.println("Outside Left:  ");
+      Serial.println(posValue[posValueLength - 1][0]);
+      lineSearch(true); //nach rechts drehen//evtl durch eine Funktion ohne While Schleife erstetzen
+    }
+    else if (posValue[posValueLength - 1][0] > total - 2)
+    {
+      Serial.println("Outside Right:  ");
+      Serial.println(posValue[posValueLength - 1][0]);
+      lineSearch(false); //nach links drehen
+    }
+    else
+    {
+      return posValue[posValueLength - 1][0];
+    }
   }
   else
   {
@@ -153,7 +195,136 @@ float linienOrt(int *input, boolean fix) //gibt Wert aus wo die Linie sich befin
   }
 }
 
-float drehCommand(float pos) //_____________________add steet value parameter or use global Variable steerValueMain
+void lineSearch(int spinState)
+{
+  float winkel = 0;
+  float maxSpin = 15;
+  Serial.println("Searching for Line");
+  Serial.println(onLine(data));
+  while (!onLine(data))
+  {
+    //rotate(winkel, 0);____________________implement rotate funktion
+    if (winkel > maxSpin)
+    {
+      spinState = false;
+      maxSpin++;
+    }
+    if (winkel < -maxSpin)
+    {
+      spinState = true;
+      maxSpin++;
+    }
+    if (spinState)
+    {
+      winkel++;
+    }
+    else
+    {
+      winkel--;
+    }
+    delay(100);
+    Serial.println(winkel);
+  }
+}
+
+boolean onLine(int *input)
+{
+  getData(false);
+  float j = 0;
+  for (int i = 0; i < total; i++)
+  {
+
+    if (input[i] < threshold)
+    {
+      j++;
+    }
+  }
+  if (j > 0)
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+void changeDirection(boolean triggerL, boolean triggerR)
+{
+  if (triggerL)
+  {
+    triggerListenL = true;
+  }
+  if (triggerR)
+  {
+    triggerListenR = true;
+  }
+  if (triggerListenL)
+  {
+    int leftSum = 0;
+    for (int i = 0; i < 3; i++)
+    {
+      if (data[i] < threshold)
+      {
+        leftSum++;
+      }
+    }
+    if (leftSum > 2)
+    {
+      actionChangeDirection(false);
+      Serial.println("Starting left turn");
+      triggerListenL = false;
+    }
+  }
+  if (triggerListenR)
+  {
+    int rightSum = 0;
+    for (int i = 3; i < total; i++)
+    {
+      if (data[i] < threshold)
+      {
+        rightSum++;
+      }
+    }
+    if (rightSum > 2)
+    {
+      actionChangeDirection(true);
+      Serial.println("Starting right turn");
+      triggerListenR = false;
+    }
+  }
+}
+
+void actionChangeDirection(boolean dir)
+{
+}
+
+void stopMovement(boolean triggerS)
+{
+  if (triggerS)
+  {
+    triggerListenS = true;
+  }
+  if (triggerListenS)
+  {
+    int stopSum = 0;
+    for (int i = 0; i < total; i++)
+    {
+      if (data[i] < threshold)
+      {
+        stopSum++;
+      }
+    }
+    if (stopSum == total)
+    {
+      //actionChangeDirection(true);
+      Serial.println("Starting Stop :-)");
+      triggerListenS = false;
+    }
+  }
+}
+//float rotate()
+float drehCommand(float pos) //_____________________add steer value parameter or use global Variable steerValueMain
 {
   if (pos < centerPos)
   {
