@@ -3,10 +3,10 @@
  
 #include <Arduino.h>
 
-class radSensor 
+class RadSensor 
 {
     public:
-        radSensor(uint8_t radAuswahl, uint8_t ausloeser);
+        RadSensor(uint8_t radAuswahl, uint8_t ausloeser);
         void begin();
         uint8_t getData(boolean debug);
         long stepRead();
