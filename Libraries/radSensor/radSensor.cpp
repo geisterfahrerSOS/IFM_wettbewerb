@@ -1,7 +1,8 @@
-#include "radSensor.h" 
+#include "radSensor.h"
 #include <Arduino.h>
 
-RadSensor::RadSensor(uint8_t radAuswahl, uint8_t ausloeser)//(Pin, Auslöser Wert)
+RadSensor::RadSensor(){};
+RadSensor::RadSensor(int radAuswahl, int ausloeser) //(Pin, Auslöser Wert)
 {
     _radPin = radAuswahl;
     _threshold = ausloeser;
@@ -14,19 +15,34 @@ void RadSensor::begin() //im setup ausführen
 
 long RadSensor::stepRead()
 {
-    _befData = getData(false);
-    if ((_befData > _threshold) && (_aftData < _threshold))
+    _befData = getData(true);
+    if ((_befData > _threshold) && (_aftData < _threshold) && (!_triggerd))
     {
-        _step++;
-        Serial.println(_step);
+        _elapsedTime = millis();
+        _triggerd = true;
+    }
+    else if (_triggerd)
+    {
+        if (_befData > _threshold)
+        {
+            if ((millis() - _elapsedTime) > 50)
+            {
+                _step++;
+                _triggerd = false;
+            }
+        }
+        else
+        {
+            _triggerd = false;
+        }
     }
     _aftData = _befData;
     return _step;
 }
 
-uint8_t RadSensor::getData(boolean debug)
+int RadSensor::getData(boolean debug)
 {
-    uint8_t data = 0;
+    int data = 0;
     data = analogRead('\016' + _radPin);
 
     if (debug)
