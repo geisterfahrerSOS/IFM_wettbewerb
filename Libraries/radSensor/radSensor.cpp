@@ -2,10 +2,11 @@
 #include <Arduino.h>
 
 RadSensor::RadSensor(){};
-RadSensor::RadSensor(int radAuswahl, int ausloeser) //(Pin, Auslöser Wert)
+RadSensor::RadSensor(int radAuswahl, int ausloeser, float distanzProStrich) //(Pin, Auslöser Wert, distanzProStrich in mm)
 {
     _radPin = radAuswahl;
     _threshold = ausloeser;
+    _distanzProStrich = distanzProStrich;
 }
 
 void RadSensor::begin() //im setup ausführen
@@ -38,6 +39,11 @@ long RadSensor::stepRead()
     }
     _aftData = _befData;
     return _step;
+}
+
+long RadSensor::umwandlungSteps(long count)
+{
+    return count*_distanzProStrich;
 }
 
 int RadSensor::getData(boolean debug)
