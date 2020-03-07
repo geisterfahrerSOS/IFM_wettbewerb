@@ -25,6 +25,7 @@ void RadSensor::begin() //im setup ausführen
     --> count kann durch _step ersetzt werden
 
     --> stepRead ist ein void
+    --> umwandlungSteps braucht kein Parameter
 */
 long RadSensor::umwandlungSteps(long count)
 {

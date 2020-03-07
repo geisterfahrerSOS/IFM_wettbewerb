@@ -18,6 +18,6 @@ void loop()
   // put your main code here, to run repeatedly:
   if (millis() - ST1 > 10)
   {
-    Serial.println(rad1.umwandlungSteps(rad1.stepRead()));
+    Serial.println(rad1.umwandlungSteps());
   }
 }
