@@ -2,6 +2,7 @@
 #include <radSensor.h>
 
 RadSensor rad1;
+//Wo wird ST1 verändert
 long ST1;
 
 void setup()

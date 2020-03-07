@@ -7,15 +7,35 @@ RadSensor::RadSensor(int radAuswahl, int ausloeser, float distanzProStrich) //(P
     _radPin = radAuswahl;
     _threshold = ausloeser;
     _distanzProStrich = distanzProStrich;
+    //pinMode('\016' + _radPin, INPUT_PULLUP);
 }
 
+/*
+    kann in dem Kostruktor mit RadPin, etc. geschrieben werden, wenn der Konstruktor im setup aufgefufen werden
+*/
 void RadSensor::begin() //im setup ausführen
 {
     pinMode('\016' + _radPin, INPUT_PULLUP);
 }
 
+/*
+    ????
+    rad1.umwandlungSteps(rad1.stepRead()
+    --> von umwandlungSteps --> count == return von rad1.stepRead()
+    --> count kann durch _step ersetzt werden
+
+    --> stepRead ist ein void
+*/
+long RadSensor::umwandlungSteps(long count)
+{
+    //return _step * _distanzProStrich;
+    return count * _distanzProStrich;
+}
+
+//void RadSensor::stepRead()
 long RadSensor::stepRead()
 {
+    //int _befData = getData(true);
     _befData = getData(true);
     if ((_befData > _threshold) && (_aftData < _threshold) && (!_triggerd))
     {
@@ -38,18 +58,14 @@ long RadSensor::stepRead()
         }
     }
     _aftData = _befData;
+    //wenn stepRead eine void Funktion wird, kann das return ausgeklammert werden
     return _step;
 }
 
-long RadSensor::umwandlungSteps(long count)
-{
-    return count*_distanzProStrich;
-}
-
+//gibt den Wert des ausgewählten Pins zurück
 int RadSensor::getData(boolean debug)
 {
-    int data = 0;
-    data = analogRead('\016' + _radPin);
+    int data = analogRead('\016' + _radPin);
 
     if (debug)
     {
