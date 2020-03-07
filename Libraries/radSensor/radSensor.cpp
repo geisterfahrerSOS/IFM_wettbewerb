@@ -26,9 +26,11 @@ void RadSensor::begin() //im setup ausführen
 
     --> stepRead ist ein void
     --> umwandlungSteps braucht kein Parameter
+    --> in umwandlungSteps muss stepRead aufgerufen werden, bevor der Rückgabewert berechnet wird
 */
 long RadSensor::umwandlungSteps(long count)
 {
+    //stepRead();
     //return _step * _distanzProStrich;
     return count * _distanzProStrich;
 }
