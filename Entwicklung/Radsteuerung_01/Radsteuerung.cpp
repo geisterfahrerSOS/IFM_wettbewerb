@@ -39,7 +39,7 @@ void Radsteuerung::radDrehung(int deltaWinkel) //WInkel von 0 bis 360 grad
 void Radsteuerung::geradeFahren(int distanz) //distanz in mm
 {
     _geradeDistanz = distanz;
-    _setStep[0] = rad[0].stepRead();
+    _setStep[0] = rad[0].umwandlung();
     _setStep[1] = rad[1].stepRead();
 }
 
