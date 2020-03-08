@@ -10,7 +10,7 @@ void setup()
 void loop()
 {
   // put your main code here, to run repeatedly:
-  Wheel.liveRad();
+  Roboter1.liveRad();
   if(ButtonPressed)//Einfach mal als beispiel
   {
     Roboter1.geradeFahren(100); //wenn der Button gepresset wird soll er 10cm nach vorne Fahren; wenn der Roboter mit einer command noch nicht 
