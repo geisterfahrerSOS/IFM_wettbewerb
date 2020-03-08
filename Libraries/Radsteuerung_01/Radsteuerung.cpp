@@ -13,7 +13,7 @@ Radsteuerung::Radsteuerung(int motorLinks, int motorRechts, int richtungLinks, i
     _richtungRechts = richtungRechts;
     rad[0] = RadSensor(0, 900, 20); //Man schaut wie weit sich jedes Rad dreht jedes mal wo geradeFahren bzw. einzelRad aufgrerufen wird nimmt man
                                     //Vergleichswerte um zu schauen wie weit sich das Rad gedereht hat
-    rad[1] = RadSensor(1, 900, 20);
+    rad[1] = RadSensor(1, 900, 20);//RadSensor(PIN, THRESHOLD, Distanz proStrich)
     _distanzEinzel[0] = 0;
     _distanzEinzel[1] = 0;
 }
