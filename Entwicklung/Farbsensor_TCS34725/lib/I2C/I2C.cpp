@@ -104,7 +104,7 @@ byte I2C::chipRead(uint8_t reg, uint8_t CTRL)
         Wire.write(CTRL);
         Wire.endTransmission();
         //lesen eines registers
-        Wire.requestFrom(address, uint8_t(1));
+        Wire.requestFrom(address, uint8_t(8));
         while (!Wire.available());
         //auslesen des registers
         ctrl_val = Wire.read();
@@ -130,11 +130,9 @@ byte I2C::chipRead(uint8_t reg)
     //Register addresse
     Wire.write(reg);
     Wire.endTransmission();
-
     //lesen eines registers
     Wire.requestFrom(address, uint8_t(1));
     while (!Wire.available());
-
     //auslesen des registers
     return Wire.read();
 };

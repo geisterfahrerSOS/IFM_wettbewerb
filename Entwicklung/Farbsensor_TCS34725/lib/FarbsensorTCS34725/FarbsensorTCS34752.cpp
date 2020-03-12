@@ -53,7 +53,7 @@ void FarbsensorTCS34725::start()
 {
     //Sensor hochfahren
     pon = true;
-    i2c.chipWrite(PON, COMMAND_BIT | ENABLE);
+    i2c.chipWrite(PON | aen | wen, COMMAND_BIT | ENABLE);
     
     //???????
     delay(10);
@@ -63,7 +63,7 @@ void FarbsensorTCS34725::stop()
 {
     //Sensor herunterfahren
     pon = false;
-    i2c.chipWrite(NPON, COMMAND_BIT | ENABLE);
+    i2c.chipWrite(NPON | aen | wen, COMMAND_BIT | ENABLE);
 };
 //erkennt die Farbe
 int FarbsensorTCS34725::farbeErkennen()
@@ -79,7 +79,7 @@ int FarbsensorTCS34725::farbeErkennen()
     if(!aen)
     {
         aAenSet = true;
-        i2c.chipWrite(AEN, COMMAND_BIT | ENABLE);
+        setAEN(true);
     }
     //wenn Zyclenmessung nicht aktiv
     if(!wen)
@@ -114,7 +114,7 @@ int FarbsensorTCS34725::farbeErkennen()
     if(aAenSet)
     {
         aAenSet = false;
-        i2c.chipWrite(NAEN, COMMAND_BIT | ENABLE);
+        setAEN(false);
     }
     //Farbe zurückgeben
     return color.getColor();
@@ -176,10 +176,10 @@ void FarbsensorTCS34725::setWen(bool wen)
     wen = wen;
     if(wen)
     {
-        i2c.chipWrite(WEN, COMMAND_BIT | ENABLE);
+        i2c.chipWrite(pon | aen | WEN, COMMAND_BIT | ENABLE);
     }else
     {
-        i2c.chipWrite(NWEN, COMMAND_BIT | ENABLE);
+        i2c.chipWrite(pon | aen | NWEN, COMMAND_BIT | ENABLE);
     }
 };
 //Setzt, ob die Farberkennung aktiv ist
@@ -188,10 +188,10 @@ void FarbsensorTCS34725::setAEN(bool aen)
     aen = aen;
     if(aen)
     {
-        i2c.chipWrite(AEN, COMMAND_BIT | ENABLE);
+        i2c.chipWrite(pon | AEN | wen, COMMAND_BIT | ENABLE);
     }else
     {
-        i2c.chipWrite(NAEN, COMMAND_BIT | ENABLE);
+        i2c.chipWrite(pon | NAEN | wen, COMMAND_BIT | ENABLE);
     }
 };
 void FarbsensorTCS34725::setPon(bool pon)
@@ -199,10 +199,10 @@ void FarbsensorTCS34725::setPon(bool pon)
     pon = pon;
     if(pon)
     {
-        i2c.chipWrite(PON, COMMAND_BIT | ENABLE);
+        i2c.chipWrite(PON | aen | wen, COMMAND_BIT | ENABLE);
     }else
     {
-        i2c.chipWrite(NPON, COMMAND_BIT | ENABLE);
+        i2c.chipWrite(NPON | aen | wen, COMMAND_BIT | ENABLE);
     }
 };
 //setzt, ob die Wartefunktion aktiviert wird und setzt eine zeit
