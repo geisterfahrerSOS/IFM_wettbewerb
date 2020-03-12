@@ -2,7 +2,7 @@
 #include <radSensor.h>
 
 RadSensor rad1;
-//Wo wird ST1 verändert
+
 long ST1;
 
 void setup()
@@ -19,5 +19,6 @@ void loop()
   if (millis() - ST1 > 10)
   {
     Serial.println(rad1.umwandlungSteps());
+    ST1 = millis();
   }
 }

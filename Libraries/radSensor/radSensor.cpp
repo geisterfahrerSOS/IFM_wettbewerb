@@ -18,28 +18,16 @@ void RadSensor::begin() //im setup ausführen
     pinMode('\016' + _radPin, INPUT_PULLUP);
 }
 
-/*
-    ????
-    rad1.umwandlungSteps(rad1.stepRead()
-    --> von umwandlungSteps --> count == return von rad1.stepRead()
-    --> count kann durch _step ersetzt werden
-
-    --> stepRead ist ein void
-    --> umwandlungSteps braucht kein Parameter
-    --> in umwandlungSteps muss stepRead aufgerufen werden, bevor der Rückgabewert berechnet wird
-*/
-long RadSensor::umwandlungSteps(long count)
+long RadSensor::umwandlungSteps()
 {
-    //stepRead();
-    //return _step * _distanzProStrich;
-    return count * _distanzProStrich;
+    stepRead();
+    return _step * _distanzProStrich;
 }
 
 //void RadSensor::stepRead()
 long RadSensor::stepRead()
 {
-    //int _befData = getData(true);
-    _befData = getData(true);
+    int _befData = getData(true);
     if ((_befData > _threshold) && (_aftData < _threshold) && (!_triggerd))
     {
         _elapsedTime = millis();
