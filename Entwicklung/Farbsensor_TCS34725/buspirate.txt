@@ -1,0 +1,97 @@
+--------------------------------------------------
+ANTSTEUERUNG DES SENSORS
+--------------------------------------------------
+HELP SHED:
+https://learn.sparkfun.com/tutorials/bus-pirate-v36a-hookup-guide/all
+http://dangerousprototypes.com/blog/bus-pirate-manual/i2c-guide/
+-------------------------------------------------
+START:
+
+MOSI --> SDA
+CLK  --> SCL
+
+ENTER:
+m
+4
+4
+--------------------------------------------------
+Tests
+--------------------------------------------------
+(1) --> Addresse
+
+[0x52 0x13[0x53 r]
+I2C START BIT
+WRITE: 0x52 ACK
+WRITE: 0x13 ACK
+I2C START BIT
+WRITE: 0x53 ACK
+READ: 0x13
+NACK
+I2C STOP BIT
+
+I2C>[0x52 0x13 [0x53 rr]
+I2C START BIT
+WRITE: 0x52 ACK
+WRITE: 0x13 ACK
+I2C START BIT
+WRITE: 0x53 ACK
+READ: 0x13                  //Zweimal
+READ:  ACK 0x00             //lesen
+NACK
+
+//PON == 1
+I2C>[0x52 0x00 0x1]
+I2C START BIT
+WRITE: 0x52 ACK
+WRITE: 0x00 ACK
+WRITE: 0x01 ACK
+
+I2C>[0x52 0x00 0x1]
+I2C START BIT
+WRITE: 0x52 ACK
+WRITE: 0x80 ACK
+WRITE: 0x01 ACK
+
+//AEN == 1
+[0x52 0x80 0b10]
+I2C START BIT
+WRITE: 0x52 ACK
+WRITE: 0x80 ACK
+WRITE: 0x02 ACK
+I2C STOP BIT
+
+[0x52 0x00 0b10]
+I2C START BIT
+WRITE: 0x52 ACK
+WRITE: 0x80 ACK
+WRITE: 0x02 ACK
+I2C STOP BIT
+
+//AEN ==1 - TEST 2
+>[0x52 0x80 0x11]
+I2C START BIT
+WRITE: 0x29 ACK
+WRITE: 0x80 ACK
+WRITE: 0x11 ACK
+
+//READ - Test 1
+WRITING
+[0x52 0x80 0b11]
+READ[0x53 r]
+getting
+READ: 0x03 ACK
+
+
+I2C>[0x52 0x80{ 0x53 r]
+I2C START BIT
+
+
+WRITE: 0x52 ACK
+WRITE: 0x80 ACK
+I2C START BIT
+WRITE: 0x53 ACK
+READ: 0x03
+NACK
+I2C STOP BIT
+
+
