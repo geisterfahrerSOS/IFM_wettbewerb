@@ -1,6 +1,7 @@
 Initialisieren durch:
 setup(){
   Winkel test = Winkel();
+  test.startup();
 }
 Ausgabe durch:
 void loop(){
