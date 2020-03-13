@@ -38,7 +38,6 @@ float Winkel::winkel()
     {
         headingDegrees -= 360;
     }
-    Serial,println("MOISSS");
     return headingDegrees;
 }
 
