@@ -81,40 +81,52 @@ int FarbsensorTCS34725::farbeErkennen()
         aAenSet = true;
         setAEN(true);
     }
+    i2c.chipWrite(0b11, 0x80);
     //wenn Zyclenmessung nicht aktiv
     if(!wen)
     {
-    uint8_t result;    
-    //Warten, bis Farbmessung beendet
-    do
-    {
-      result = i2c.chipRead(STATUS);
-      result = result & 0b1;
+        uint8_t result;    
+        //Warten, bis Farbmessung beendet
+        do
+        {
+        result = i2c.chipRead(STATUS);
+        result = result & 0b1;
+        }
+        while(result == 0);
     }
-    while(result ==1);
-    }
+    //Farbe lesen
+    setAEN(false);
+    int red = i2c.readSensor(0x80 | 0x16, 0x80 | 0x17);
+    int blue = i2c.readSensor(0x80 | 0x1A, 0x80 | 0x1B);
+    int green = i2c.readSensor(0x80 | 0x18, 0x80 | 0x19);
+
+
+    Serial.print("RED1: "); Serial.println(red);
+    Serial.print("GREEN1: "); Serial.println(green);
+    Serial.print("BLUE1: "); Serial.println(blue);
+    
+    /*
+    color.setColor(map(i2c.readSensor(RDATAL, RDATAH), 0, maxVal, 0, 255),
+                 map(i2c.readSensor(GDATAL, GDATAH), 0, maxVal, 0, 255),
+                 map(i2c.readSensor(BDATAL, BDATAH), 0, maxVal, 0, 255),
+                 map(i2c.readSensor(CDATAL, CDATAH), 0, maxVal, 0, 255)
+    );
+    */
+    //Farbe überprüfen
+    //color.checkColor();
+    //Farbe ausgeben
+    //color.printColor();
     //Farbmessen ausstellen
     if(ponSet)
     {
         ponSet = false;
         stop();
     }
-    //Farbe lesen
-    color.setColor(map(i2c.readSensor(RDATAL, RDATAH), 0, maxVal, 0, 255),
-                 map(i2c.readSensor(GDATAL, GDATAH), 0, maxVal, 0, 255),
-                 map(i2c.readSensor(BDATAL, BDATAH), 0, maxVal, 0, 255),
-                 map(i2c.readSensor(CDATAL, CDATAH), 0, maxVal, 0, 255)
-    );
-    //Farbe überprüfen
-    color.checkColor();
-    //Farbe ausgeben
-    color.printColor();
-
     //Wenn Farbenlesen nicht aktiv war, dass Farvbenlessen deaktiwieren
-    if(aAenSet)
+    if(!aAenSet)
     {
         aAenSet = false;
-        setAEN(false);
+        setAEN(true);
     }
     //Farbe zurückgeben
     return color.getColor();
@@ -176,10 +188,10 @@ void FarbsensorTCS34725::setWen(bool wen)
     wen = wen;
     if(wen)
     {
-        i2c.chipWrite(pon | aen | WEN, COMMAND_BIT | ENABLE);
+        i2c.chipWrite(WEN, COMMAND_BIT | ENABLE);
     }else
     {
-        i2c.chipWrite(pon | aen | NWEN, COMMAND_BIT | ENABLE);
+        i2c.chipWrite(NWEN, COMMAND_BIT | ENABLE);
     }
 };
 //Setzt, ob die Farberkennung aktiv ist
@@ -188,10 +200,10 @@ void FarbsensorTCS34725::setAEN(bool aen)
     aen = aen;
     if(aen)
     {
-        i2c.chipWrite(pon | AEN | wen, COMMAND_BIT | ENABLE);
+        i2c.chipWrite(AEN | 0b1, COMMAND_BIT | ENABLE);
     }else
     {
-        i2c.chipWrite(pon | NAEN | wen, COMMAND_BIT | ENABLE);
+        i2c.chipWrite(NAEN | 0b1, COMMAND_BIT | ENABLE);
     }
 };
 void FarbsensorTCS34725::setPon(bool pon)
@@ -199,10 +211,10 @@ void FarbsensorTCS34725::setPon(bool pon)
     pon = pon;
     if(pon)
     {
-        i2c.chipWrite(PON | aen | wen, COMMAND_BIT | ENABLE);
+        i2c.chipWrite(PON, COMMAND_BIT | ENABLE);
     }else
     {
-        i2c.chipWrite(NPON | aen | wen, COMMAND_BIT | ENABLE);
+        i2c.chipWrite(NPON, COMMAND_BIT | ENABLE);
     }
 };
 //setzt, ob die Wartefunktion aktiviert wird und setzt eine zeit
