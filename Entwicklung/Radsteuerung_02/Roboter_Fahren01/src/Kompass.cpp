@@ -25,7 +25,7 @@ void Winkel::startup()
 }
 float Winkel::winkel()
 {
-
+    Serial.println("MOISSSSS");
     float headingDegrees;
 
     headingDegrees = 360 - (atan2(calc(read12bit(ADDRESS1, OUT_X_H_M, OUT_X_L_M)), calc(read12bit(ADDRESS1, OUT_Y_H_M, OUT_Y_L_M))) + 0.052) * 180 / PI;
