@@ -59,25 +59,25 @@ class FarbsensorTCS34725
         //Konstruktor
         FarbsensorTCS34725();
         //Konstruktor - für Einmalmessung
-        FarbsensorTCS34725(uint8_t add, int led, uint8_t aGain, uint8_t integCycle);
+        FarbsensorTCS34725(uint8_t aAdd, int aLed, uint8_t aAGain, uint8_t aIntegCycle);
         //Konstrukor für Messung nach delay(wTime)
-        FarbsensorTCS34725(uint8_t add, int led, uint8_t wTime, bool wLong, uint8_t aGain, uint8_t integCycle);
+        FarbsensorTCS34725(uint8_t aAdd, int aLed, uint8_t aWTime, bool aWLong, uint8_t aAGain, uint8_t aIntegCycle);
         //setzt den Integraion Cycle
-        void setIntegCycle(uint8_t integCycle);
+        void setIntegCycle(uint8_t aIntegCycle);
         //setzt den Gain
-        void setAGain(uint8_t aGain);
+        void setAGain(uint8_t aAGain);
         //setzt die Wartezeit
-        void setWTime(uint8_t wTime);
+        void setWTime(uint8_t AWTime);
         //setzt, ob die wartezeit 12x so hoch ist
-        void setWLong(bool wLong);
+        void setWLong(bool aWLong);
         //setzt, ob die Wartefunktion aktiviert wird
-        void setWen(bool wen);
+        void setWen(bool aWen);
         //Setzt, ob die Farberkennung aktiv ist
-        void setAEN(bool aen);
+        void setAEN(bool aAen);
         //setzt, ob die Wartefunktion aktiviert wird und setzt eine zeit
-        void setWen(bool wen, uint8_t wTime);
+        void setWen(bool aWen, uint8_t aWTime);
         //Setzt, ob der Sensor in dem SLEEP- oder IDLE-Modus ist
-        void setPon(bool pon);
+        void setPon(bool aPon);
         //erkennt die Farbe
         int farbeErkennen();
         //setzt den Sensor in den IDLE-Modus

@@ -18,7 +18,7 @@ class Farbsensor
     public:
         //Konstruktoren
         Farbsensor();
-        Farbsensor(int led);
+        Farbsensor(int aLed);
         //messen der Farbe
         int farbeErkennen();
 };
