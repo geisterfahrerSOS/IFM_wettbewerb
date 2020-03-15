@@ -6,23 +6,24 @@ I2C::I2C()
     Wire.begin();
 };
 //Konsturkor
-I2C::I2C(uint8_t add)
+I2C::I2C(uint8_t aAdd)
 {
-    address = add;
+    address = aAdd;
     Wire.begin();
 };
 //Konsturkor
-I2C::I2C(uint8_t add, int led)
+I2C::I2C(uint8_t aAdd, int aLed, bool aPermLED)
 {
-    address = add;
-    LED = led;
+    permLED = aPermLED;
+    address = aAdd;
+    LED = aLed;
     pinMode(LED, OUTPUT);
     Wire.begin();
 };
 //setzt die Adresse des Gerätes
-void I2C::setAdress(uint8_t add)
+void I2C::setAdress(uint8_t aAdd)
 {
-    address = add;
+    address = aAdd;
 };
 //gibt die Ardesse des Gerätes zurück
 int I2C::getAdress()
@@ -30,15 +31,18 @@ int I2C::getAdress()
     return address;
 };
 //ließt einen Sensor aus
-int I2C::readSensor(uint8_t reg_lo, uint8_t reg_hi, uint8_t CTRL)
+int I2C::readSensor(uint8_t aReg_lo, uint8_t aReg_hi, uint8_t aCTRL)
 {
     //LED an
     digitalWrite(LED, HIGH); 
     delay(10);
     //Sensorwert
-    int result = combineByte(chipRead(reg_hi, CTRL), chipRead(reg_lo, CTRL));
+    int result = combineByte(chipRead(aReg_hi, aCTRL), chipRead(aReg_lo, aCTRL));
     //LED aus
-    digitalWrite(LED, LOW);
+    if(!permLED)
+    {
+        digitalWrite(LED, LOW);
+    }
     //Ausgabe des Sensorwerts
     // Serial.print("0x");
     // Serial.print(reg_hi, HEX);
@@ -47,15 +51,18 @@ int I2C::readSensor(uint8_t reg_lo, uint8_t reg_hi, uint8_t CTRL)
     //gibt den Wert zurück
     return result;
 };
-int I2C::readSensor(uint8_t reg_lo, uint8_t reg_hi)
+int I2C::readSensor(uint8_t aReg_lo, uint8_t aReg_hi)
 {
     //LED an
     digitalWrite(LED, HIGH);
     delay(10);
     //Sensorwert
-    int result = combineByte(chipRead(reg_hi), chipRead(reg_lo));
+    int result = combineByte(chipRead(aReg_hi), chipRead(aReg_lo));
     //LED aus
-    digitalWrite(LED, LOW);
+    if(!permLED)
+    {
+        digitalWrite(LED, LOW);
+    }
     //Ausgabe des Sensorwerts
     // Serial.print("0x");
     // Serial.print(reg_hi, HEX);
@@ -65,43 +72,43 @@ int I2C::readSensor(uint8_t reg_lo, uint8_t reg_hi)
     return result;
 };
 //schreibt einen INT-Wert in zwei Register
-void I2C::chipWrite(uint8_t reg_lo, uint8_t reg_hi, int val)
+void I2C::chipWrite(uint8_t aReg_lo, uint8_t aReg_hi, int aVal)
 {
     //kreirt zwei Pointer
     byte *lo = new byte, *hi = new byte;
     //teilt den INT-Wert
-    splitByte(1023, lo, hi);
+    splitByte(aVal, lo, hi);
     //schreibt die Werte in die Register
-    chipWrite(*lo, reg_lo);
-    chipWrite(*hi, reg_hi);
+    chipWrite(*lo, aReg_lo);
+    chipWrite(*hi, aReg_hi);
     //löscht die Pointer
     delete lo;
     delete hi;
 };
 //schreibt einen BYTE-Wert in ein Register
-void I2C::chipWrite(uint8_t val, uint8_t reg)
+void I2C::chipWrite(uint8_t aVal, uint8_t aReg)
 {
     //Adresse des Gerätes
     Wire.beginTransmission(address);
     //Register
-    Wire.write(reg);
+    Wire.write(aReg);
     //Wert
-    Wire.write(val);
+    Wire.write(aVal);
     //beenden
     Wire.endTransmission();
 };
 //Ließt einen BYTE-Wert aus einem Register
-byte I2C::chipRead(uint8_t reg, uint8_t CTRL)
+byte I2C::chipRead(uint8_t aReg, uint8_t aCTRL)
 {
     //damit werte aus dem Register "reg" ausgelesen werden können muss 0x01 in das Controllregister geschrieben werden
-    chipWrite(0x01, CTRL);
+    chipWrite(0x01, aCTRL);
     byte ctrl_val = 1;
     while(ctrl_val != 0)
     {
         //Geräte addresse
         Wire.beginTransmission(address);
         //Register addresse
-        Wire.write(CTRL);
+        Wire.write(aCTRL);
         Wire.endTransmission();
         //lesen eines registers
         Wire.requestFrom(address, uint8_t(8));
@@ -113,7 +120,7 @@ byte I2C::chipRead(uint8_t reg, uint8_t CTRL)
     //Geräte addresse
     Wire.beginTransmission(address);
     //Register addresse
-    Wire.write(reg);
+    Wire.write(aReg);
     Wire.endTransmission();
 
     //lesen eines registers
@@ -123,12 +130,12 @@ byte I2C::chipRead(uint8_t reg, uint8_t CTRL)
     //auslesen des registers
     return Wire.read();
 };
-byte I2C::chipRead(uint8_t reg)
+byte I2C::chipRead(uint8_t aReg)
 {
     //Geräte addresse
     Wire.beginTransmission(address);
     //Register addresse
-    Wire.write(reg);
+    Wire.write(aReg);
     Wire.endTransmission();
     //lesen eines registers
     Wire.requestFrom(address, uint8_t(1));
@@ -137,37 +144,41 @@ byte I2C::chipRead(uint8_t reg)
     return Wire.read();
 };
 //Combiniert zwei BYTE-Werte zu einem INT-Wert
-int I2C::combineByte(byte front, byte back)
+int I2C::combineByte(byte aFront, byte aBack)
 {
-    int result = front;
+    int result = aFront;
     //schiebt den vorderen Teil um 8 Bits nach links
     result <<= 8;
     //fügt den hinteren Teil ein
-    result |= back;
+    result |= aBack;
     return result;
 };
 //Gibt ein Register mit Registernummer und -wert aus
-void I2C::printRegister(byte reg, uint8_t CTRL)
+void I2C::printRegister(byte aReg, uint8_t aCTRL)
 {
     Serial.print("0x");
-    Serial.print(reg, HEX);
+    Serial.print(aReg, HEX);
     Serial.print(" : ");
-    Serial.print(chipRead(reg, CTRL));
+    Serial.print(chipRead(aReg, aCTRL));
 };
 //teilt einen INT-Wert in zwei BYTE-Werte auf
-void I2C::splitByte(int val, byte *lo, byte *hi)
+void I2C::splitByte(int aVal, byte *aLo, byte *aHi)
 {
     //vordere 8-Bits
-    int toSplit = val;
+    int toSplit = aVal;
     toSplit >>= 8;
-    *lo = toSplit;
+    *aLo = toSplit;
     //hintere 8-Bits
-    val <<= 8;
-    val >>= 8;
-    *hi = val;  
+    aVal <<= 8;
+    aVal >>= 8;
+    *aHi = aVal;  
 };
-void I2C::setLED(int led)
+void I2C::setLED(int aLed)
 {
-    LED = led;
+    LED = aLed;
     pinMode(LED, OUTPUT);
+};
+void I2C::setPermLED(bool aPermLED)
+{
+    permLED = aPermLED;
 };

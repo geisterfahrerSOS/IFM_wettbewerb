@@ -16,8 +16,8 @@ class Farbe
         int color;
     public:
         //setzt die Farbe
-        void setColor(byte red, byte green, byte blue);
-        void setColor(byte red, byte green, byte blue, byte clear);
+        void setColor(byte aRed, byte aGreen, byte aBlue);
+        void setColor(byte aRed, byte aGreen, byte aBlue, byte aClear);
         //Updated die Farbe
         void checkColor();
         //gibt die Farbe zurück
@@ -25,8 +25,8 @@ class Farbe
         //gibt die Farbe aus(Serial)
         void printColor();
         //Konstruktoren
-        Farbe(byte red, byte green, byte blue, byte clear);
-        Farbe(byte red, byte green, byte blue);
+        Farbe(byte aRed, byte aGreen, byte aBlue, byte aClear);
+        Farbe(byte aRed, byte aGreen, byte aBlue);
         Farbe();
 };
 #endif
