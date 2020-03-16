@@ -5,46 +5,46 @@ Farbe::Farbe()
 {
     color = -1;
 };
-Farbe::Farbe(byte red, byte green, byte blue, byte clear)
+Farbe::Farbe(byte aRed, byte aGreen, byte aBlue, byte aClear)
 {
     //setzt die Farben mit CLEAR
-    red = red;
-    green = green;
-    blue = blue;
-    clear = clear;
+    red = aRed;
+    green = aGreen;
+    blue = aBlue;
+    clear = aClear;
     color = -1;
 };
-Farbe::Farbe(byte red, byte green, byte blue)
+Farbe::Farbe(byte aRed, byte aGreen, byte aBlue)
 {
     //setzt die Farben ohne CLEAR
-    red = red;
-    green = green;
-    blue = blue;
+    red = aRed;
+    green = aGreen;
+    blue = aBlue;
     color = -1;
 };
 //setzt die Farbe ohne CLEAR
-void Farbe::setColor(byte red, byte green, byte blue)
+void Farbe::setColor(byte aRed, byte aGreen, byte aBlue)
 {
-    red = red;
-    green = green;
-    blue = blue;
+    red = aRed;
+    green = aGreen;
+    blue = aBlue;
     // Serial.print("RED: "); Serial.println(red);
     // Serial.print("GREEN: "); Serial.println(green);
     // Serial.print("BLUE: "); Serial.println(blue);
     // Serial.println();
 };
 //setzt die Farbe mit CLEAR
-void Farbe::setColor(byte red, byte green, byte blue, byte clear)
+void Farbe::setColor(byte aRed, byte aGreen, byte aBlue, byte aClear)
 {
-    red = red;
-    green = green;
-    blue = blue;
-    clear = clear;
-    // Serial.print("RED: "); Serial.println(red);
-    // Serial.print("GREEN: "); Serial.println(green);
-    // Serial.print("BLUE: "); Serial.println(blue);
-    // Serial.print("CLEAR: "); Serial.println(clear);
-    // Serial.println();
+    red = aRed;
+    green = aGreen;
+    blue = aBlue;
+    clear = aClear;
+    Serial.print("RED: "); Serial.println(red);
+    Serial.print("GREEN: "); Serial.println(green);
+    Serial.print("BLUE: "); Serial.println(blue);
+    Serial.print("CLEAR: "); Serial.println(clear);
+    Serial.println();
 };
 //gibt die Farbe zurück
 int Farbe::getColor()
@@ -54,7 +54,6 @@ int Farbe::getColor()
     return color;
 };
 //Updatet die Farbe
-/*ÜBERARBEITEN*/
 void Farbe::checkColor()
 {
     // Serial.print("RED: "); Serial.println(red);
@@ -72,9 +71,9 @@ void Farbe::checkColor()
     // Serial.print("DIFFERENCEGB: ");Serial.println(differenceGB);
     
     //Weiß
-    if(differenceRG > 0.8 && differenceRG < 1.2
-        && differenceRB > 0.8 && differenceRB < 1.2
-        && differenceGB > 0.8 && differenceGB < 1.2
+    if(differenceRG > 0.9 && differenceRG < 1.1
+        && differenceRB > 0.9 && differenceRB < 1.1
+        && differenceGB > 0.9 && differenceGB < 1.1
         && red > 127//&& red < 
         && green > 127//&& green < 
         && blue > 127//&& blue <
@@ -83,9 +82,9 @@ void Farbe::checkColor()
         color = 7;
     }
     //schwarz
-    else if(differenceRG > 0.8 && differenceRG < 1.2
-        && differenceRB > 0.8 && differenceRB < 1.2
-        && differenceGB > 0.8 && differenceGB < 1.2 
+    else if(differenceRG > 0.9 && differenceRG < 1.1
+        && differenceRB > 0.9 && differenceRB < 1.1
+        && differenceGB > 0.9 && differenceGB < 1.1 
         /*&& red > */&& red < 127
         /*&& green > */&& green < 127
         /*&& blue > */&& blue < 127
@@ -153,6 +152,7 @@ void Farbe::checkColor()
 //gibt die Farbe aus(Serial)
 void Farbe::printColor()
 {
+    Serial.print("Farbe: ");
     switch(color)
     {
         case 1:

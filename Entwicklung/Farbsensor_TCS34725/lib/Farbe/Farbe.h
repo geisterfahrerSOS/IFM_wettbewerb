@@ -25,8 +25,8 @@ class Farbe
         //gibt die Farbe aus(Serial)
         void printColor();
         //Konstruktoren
-        Farbe(byte red, byte green, byte blue, byte clear);
-        Farbe(byte red, byte green, byte blue);
+        Farbe(byte aRed, byte aGreen, byte aBlue, byte aClear);
+        Farbe(byte aRed, byte aGreen, byte aBlue);
         Farbe();
 };
 #endif

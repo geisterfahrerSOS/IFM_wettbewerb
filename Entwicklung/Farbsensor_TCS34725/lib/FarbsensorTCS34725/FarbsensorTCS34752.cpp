@@ -5,136 +5,94 @@
 //Konstruktor
 FarbsensorTCS34725::FarbsensorTCS34725(){};
 //Konstruktor - für Einmalmessung
-FarbsensorTCS34725::FarbsensorTCS34725(uint8_t add, int led, uint8_t aGain, uint8_t integCycle)
+FarbsensorTCS34725::FarbsensorTCS34725(uint8_t aAdd, int aLed, uint8_t aAGain, uint8_t aIntegCycle)
 {
     //I2C-Verbindung aufbauen
-    i2c = I2C(add, led);
+    i2c = I2C(aAdd, aLed, false);
+    //Sensor hochfahren
+    start();
     //Gain setzen
-    setAGain(aGain);
+    setAGain(aAGain);
     //Integration Time setzen 
-    setIntegCycle(integCycle);
+    setIntegCycle(aIntegCycle);
     //Wait time setzen(minimum)
     setWTime(WTIME_2_4);
     //12x wTime nicht aktiv 
     setWLong(false);
-    //Schlaf-Modus
-    setPon(false);
     //keine Farberkennung
-    setAEN(false);
+    setAEN(true);
     //Wartezeit-funktion aus
     setWen(false);
     //Sensor hochfahren
-    start();
 };
 //Konstrukor für Messung nach delay(wTime)
-FarbsensorTCS34725::FarbsensorTCS34725(uint8_t add, int led, uint8_t wTime, bool wLong, uint8_t aGain, uint8_t integCycle)
+FarbsensorTCS34725::FarbsensorTCS34725(uint8_t aAdd, int aLed, uint8_t aWTime, bool aWLong, uint8_t aAGain, uint8_t aIntegCycle)
 {
     //I2C-Verbindung aufbauen
-    i2c = I2C(add, led);
+    i2c = I2C(aAdd, aLed, true);
+    //Sensor hochfahren
+    start();
     //Gain setzen
-    setAGain(aGain);
+    setAGain(aAGain);
     //Integration Time setzen 
-    setIntegCycle(integCycle);
+    setIntegCycle(aIntegCycle);
     //Wait time setzen
-    setWTime(wTime);
+    setWTime(aWTime);
+    //Wartezeit-funktion ein
+    setWen(true);
     //Farberkennung
     setAEN(true);
     //Idle-Modus
-    setPon(true);
-    //Wartezeit-funktion ein
-    setWen(true);
+    //setPon(true);
     //12x wTime
-    setWLong(wLong);
-    //Sensor hochfahren
-    start();
+    setWLong(aWLong);
+    Serial.println(i2c.chipRead(0x80), BIN);
 };
 //setzt den Sensor in den IDLE-Modus
 void FarbsensorTCS34725::start()
 {
     //Sensor hochfahren
-    pon = true;
-    i2c.chipWrite(PON | aen | wen, COMMAND_BIT | ENABLE);
-    
-    //???????
-    delay(10);
+    setPon(true);
 };
 //setzt den Sensor in den SLEEP-Modus
 void FarbsensorTCS34725::stop()
 {
     //Sensor herunterfahren
-    pon = false;
-    i2c.chipWrite(NPON | aen | wen, COMMAND_BIT | ENABLE);
+    setPon(false);
 };
 //erkennt die Farbe
 int FarbsensorTCS34725::farbeErkennen()
 {
-    bool ponSet, aAenSet;
-    //wenn der Sensor im Sleep-Modus ist, in den Idle-Modus setzen
-    if(!pon)
-    {
-        ponSet = true;
-        start();
-    }
-    //Wenn Farbenlesen nicht aktiv ist, dass Farvbenlessen aktivieren
-    if(!aen)
-    {
-        aAenSet = true;
-        setAEN(true);
-    }
-    i2c.chipWrite(0b11, 0x80);
     //wenn Zyclenmessung nicht aktiv
     if(!wen)
     {
+        Serial.println("NOT WEN");
         uint8_t result;    
         //Warten, bis Farbmessung beendet
         do
         {
-        result = i2c.chipRead(STATUS);
-        result = result & 0b1;
+            result = i2c.chipRead(STATUS);
+            result = result & 0b1;
         }
         while(result == 0);
     }
     //Farbe lesen
-    setAEN(false);
-    int red = i2c.readSensor(0x80 | 0x16, 0x80 | 0x17);
-    int blue = i2c.readSensor(0x80 | 0x1A, 0x80 | 0x1B);
-    int green = i2c.readSensor(0x80 | 0x18, 0x80 | 0x19);
-
-
-    Serial.print("RED1: "); Serial.println(red);
-    Serial.print("GREEN1: "); Serial.println(green);
-    Serial.print("BLUE1: "); Serial.println(blue);
-    
-    /*
-    color.setColor(map(i2c.readSensor(RDATAL, RDATAH), 0, maxVal, 0, 255),
-                 map(i2c.readSensor(GDATAL, GDATAH), 0, maxVal, 0, 255),
-                 map(i2c.readSensor(BDATAL, BDATAH), 0, maxVal, 0, 255),
-                 map(i2c.readSensor(CDATAL, CDATAH), 0, maxVal, 0, 255)
+    color.setColor(map(i2c.readSensor(RDATAL | COMMAND_BIT, RDATAH | COMMAND_BIT), 0, maxVal, 0, 255),
+                   map(i2c.readSensor(GDATAL | COMMAND_BIT, GDATAH | COMMAND_BIT), 0, maxVal, 0, 255),
+                   map(i2c.readSensor(BDATAL | COMMAND_BIT, BDATAH | COMMAND_BIT), 0, maxVal, 0, 255),
+                   map(i2c.readSensor(CDATAL | COMMAND_BIT, CDATAH | COMMAND_BIT), 0, maxVal, 0, 255)
     );
-    */
     //Farbe überprüfen
-    //color.checkColor();
+    color.checkColor();
     //Farbe ausgeben
-    //color.printColor();
-    //Farbmessen ausstellen
-    if(ponSet)
-    {
-        ponSet = false;
-        stop();
-    }
-    //Wenn Farbenlesen nicht aktiv war, dass Farvbenlessen deaktiwieren
-    if(!aAenSet)
-    {
-        aAenSet = false;
-        setAEN(true);
-    }
+    color.printColor();
     //Farbe zurückgeben
     return color.getColor();
 };
 //setzt den Integraion Cycle
-void FarbsensorTCS34725::setIntegCycle(uint8_t integCycle)
+void FarbsensorTCS34725::setIntegCycle(uint8_t aIntegCycle)
 {
-    integCycle = integCycle;
+    integCycle = aIntegCycle;
     switch(integCycle)
     {
         case INTEG_CYCLE_1:
@@ -158,21 +116,21 @@ void FarbsensorTCS34725::setIntegCycle(uint8_t integCycle)
     i2c.chipWrite(integCycle, COMMAND_BIT | ATIME);  
 };
 //setzt den Gain //nur die ersten zwei Bits
-void FarbsensorTCS34725::setAGain(uint8_t aGain)
+void FarbsensorTCS34725::setAGain(uint8_t aAGain)
 {
-    aGain = aGain;
+    aGain = aAGain;
     i2c.chipWrite(aGain, COMMAND_BIT | CONTROL);
 };
 //setzt die Wartezeit
-void FarbsensorTCS34725::setWTime(uint8_t wTime)
+void FarbsensorTCS34725::setWTime(uint8_t AWTime)
 {
-    wTime = wTime;
+    wTime = AWTime;
     i2c.chipWrite(wTime, COMMAND_BIT | WTIME);
 };
 //setzt, ob die wartezeit 12x so hoch ist
-void FarbsensorTCS34725::setWLong(bool wLong)
+void FarbsensorTCS34725::setWLong(bool aWLong)
 {
-    wLong = wLong;
+    wLong = aWLong;
     if(wLong)
     {
         i2c.chipWrite(WLONG, COMMAND_BIT | CONFIG);
@@ -183,43 +141,56 @@ void FarbsensorTCS34725::setWLong(bool wLong)
     
 };
 //setzt, ob die Wartefunktion aktiviert wird
-void FarbsensorTCS34725::setWen(bool wen)
+void FarbsensorTCS34725::setWen(bool aWen)
 {
-    wen = wen;
+    wen = aWen;
+    byte tmpAen, tmpPon;
+    if(aen){tmpAen = AEN;}else{tmpAen = NAEN;}
+    if(pon){tmpPon = PON;}else{tmpPon = NPON;}
     if(wen)
     {
-        i2c.chipWrite(WEN, COMMAND_BIT | ENABLE);
+        i2c.chipWrite(WEN | tmpAen | tmpPon, COMMAND_BIT | ENABLE);
+        delayMicroseconds(2400);
     }else
     {
-        i2c.chipWrite(NWEN, COMMAND_BIT | ENABLE);
+        i2c.chipWrite(NWEN | tmpAen | tmpPon, COMMAND_BIT | ENABLE);
     }
 };
 //Setzt, ob die Farberkennung aktiv ist
-void FarbsensorTCS34725::setAEN(bool aen)
+void FarbsensorTCS34725::setAEN(bool aAen)
 {
-    aen = aen;
+    aen = aAen;
+    byte tmpWen, tmpPon;
+    if(wen){tmpWen = WEN;}else{tmpWen = NWEN;}
+    if(pon){tmpPon = PON;}else{tmpPon = NPON;}
     if(aen)
     {
-        i2c.chipWrite(AEN | 0b1, COMMAND_BIT | ENABLE);
-    }else
+        i2c.chipWrite(tmpWen | AEN | tmpPon, COMMAND_BIT | ENABLE);
+        delayMicroseconds(2400);
+    }
+    else
     {
-        i2c.chipWrite(NAEN | 0b1, COMMAND_BIT | ENABLE);
+        i2c.chipWrite(tmpWen | NAEN | tmpPon, COMMAND_BIT | ENABLE);
     }
 };
-void FarbsensorTCS34725::setPon(bool pon)
+void FarbsensorTCS34725::setPon(bool aPon)
 {
-    pon = pon;
+    pon = aPon;
+    byte tmpWen, tmpAen;
+    if(wen){tmpWen = WEN;}else{tmpWen = NWEN;}
+    if(aen){tmpAen = AEN;}else{tmpAen = NAEN;}
     if(pon)
     {
-        i2c.chipWrite(PON, COMMAND_BIT | ENABLE);
+        i2c.chipWrite(tmpWen | tmpAen | PON, COMMAND_BIT | ENABLE);
+        delayMicroseconds(2400);
     }else
     {
-        i2c.chipWrite(NPON, COMMAND_BIT | ENABLE);
+        i2c.chipWrite(tmpWen | tmpAen | NPON, COMMAND_BIT | ENABLE);
     }
 };
 //setzt, ob die Wartefunktion aktiviert wird und setzt eine zeit
-void FarbsensorTCS34725::setWen(bool wen, uint8_t wTime)
+void FarbsensorTCS34725::setWen(bool aWen, uint8_t aWTime)
 {
-    setWen(wen);
-    setWTime(wTime);
+    setWen(aWen);
+    setWTime(aWTime);
 };

@@ -1,0 +1,26 @@
+-------------------------FARBE---------------
+Hält die Farbwerte
+rot, grün, blau, clear
+gibt die Farbe zurück
+----------------------------------------------------
+kreiren eines Objekts:
+Farbe(byte aRed, byte aGreen, byte aBlue, byte aClear);
+Farbe(byte aRed, byte aGreen, byte aBlue);
+Farbe();
+----------------------------------------------------
+prüft, welche Farbe die Werte entsprechen
+void checkColor();
+
+gibt die Farbe zurück
+int getColor();
+1--> Orange
+2--> Gelb
+3--> Grün
+4--> Blau
+5--> Rot
+6--> Schwarz
+7--> Weiß
+-1--> Keine Farbe
+
+gibt die Farbe aus(Serial)
+void printColor();

@@ -5,21 +5,21 @@ Farbe::Farbe()
 {
     color = -1;
 };
-Farbe::Farbe(byte red, byte green, byte blue, byte clear)
+Farbe::Farbe(byte aRed, byte aGreen, byte aBlue, byte aClear)
 {
     //setzt die Farben mit CLEAR
-    red = red;
-    green = green;
-    blue = blue;
-    clear = clear;
+    red = aRed;
+    green = aGreen;
+    blue = aBlue;
+    clear = aClear;
     color = -1;
 };
-Farbe::Farbe(byte red, byte green, byte blue)
+Farbe::Farbe(byte aRed, byte aGreen, byte aBlue)
 {
     //setzt die Farben ohne CLEAR
-    red = red;
-    green = green;
-    blue = blue;
+    red = aRed;
+    green = aGreen;
+    blue = aBlue;
     color = -1;
 };
 //setzt die Farbe ohne CLEAR
@@ -28,10 +28,10 @@ void Farbe::setColor(byte aRed, byte aGreen, byte aBlue)
     red = aRed;
     green = aGreen;
     blue = aBlue;
-    // Serial.print("RED: "); Serial.println(red);
-    // Serial.print("GREEN: "); Serial.println(green);
-    // Serial.print("BLUE: "); Serial.println(blue);
-    // Serial.println();
+    Serial.print("RED: "); Serial.println(red);
+    Serial.print("GREEN: "); Serial.println(green);
+    Serial.print("BLUE: "); Serial.println(blue);
+    Serial.println();
 };
 //setzt die Farbe mit CLEAR
 void Farbe::setColor(byte aRed, byte aGreen, byte aBlue, byte aClear)

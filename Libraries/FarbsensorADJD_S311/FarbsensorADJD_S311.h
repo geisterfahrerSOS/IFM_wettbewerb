@@ -1,12 +1,12 @@
-#ifndef Farbsensor_h
-#define Farbsensor_h
+#ifndef FarbsensorADJD_S311_h
+#define FarbsensorADJD_S311_h
 #include <Arduino.h>
 #include <I2C.h>
 #include <Farbe.h>
 /*
     Liest Farbe, braucht Farbe.h
 */
-class Farbsensor
+class FarbsensorADJD_S311
 {
     private:
         //Pin der LED
@@ -18,7 +18,7 @@ class Farbsensor
     public:
         //Konstruktoren
         Farbsensor();
-        Farbsensor(int led);
+        Farbsensor(int aLed);
         //messen der Farbe
         int farbeErkennen();
 };
