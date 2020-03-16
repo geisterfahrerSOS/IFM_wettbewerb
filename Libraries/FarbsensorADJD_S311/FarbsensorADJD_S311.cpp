@@ -1,4 +1,4 @@
-#include <Farbsensor.h>
+#include <FarbsensorADJD_S311.h>
 //definiert die Register
 #define CTRL 0x00
 #define CONFIG 0x01

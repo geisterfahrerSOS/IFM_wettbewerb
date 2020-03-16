@@ -1,0 +1,54 @@
+-------------------------I2C---------------
+baut eine Verbindung zu einem I2c-Gerät auf
+----------------------------------------------------
+benötigt
+Wire.h
+----------------------------------------------------
+kreiren eines Objekts:
+I2C();
+I2C(uint8_t adresse);
+I2C(uint8_t adresse, int Led-Pin, bool permLed-an?);
+----------------------------------------------------
+setzt die Addresse, des Gerätes
+setAdress(uint8_t adresse);
+
+gibt die Ardesse des Gerätes zurück
+getAdress() : int
+gibt einen INT-Wert zurück
+
+setzt den Pin, an welchem die LED angeschlossen ist
+setLED(int aLed);
+
+liesßt den Sensor aus(ADJD-S311)
+int readSensor(uint8_t aReg_lo, uint8_t aReg_hi, uint8_t aCTRL): int
+gibt einen INT-Wert zurück
+
+liesßt den Sensor aus(TCS34725)
+readSensor(uint8_t aReg_lo,uint8_t aReg_hi) : int
+gibt einen INT-Wert zurück
+
+schreibt einen INT-Wert in zwei Register
+chipWrite(uint8_t aReg_lo, uint8_t aReg_hi, int aVal);
+
+schreibt einen BYTE-Wert in ein Register
+chipWrite(uint8_t aVal, uint8_t aReg);
+
+Ließt einen BYTE-Wert aus einem Register(ADJD-S311)
+chipRead(uint8_t aReg, uint8_t aCTRL) : byte
+gibt einen BYTE-Wert zurück
+
+Ließt einen BYTE-Wert aus einem Register(TCS34725)
+chipRead(uint8_t aReg): byte
+gibt einen BYTE-Wert zurück
+
+Combiniert zwei BYTE-Werte zu einem INT-Wert
+combineByte(byte aFront, byte aBack) : int
+
+Gibt ein Register mit Registernummer und -wert aus
+void printRegister(byte aReg, uint8_t aCTRL);
+
+teilt einen INT-Wert in zwei BYTE-Werte auf
+void splitByte(int aVal, byte *aLo, byte *aHi);
+
+bestimmt, ob LED ausgeschaltet werden kann oder permanent an ist
+void setPermLED(bool aPermLED);

@@ -1,0 +1,15 @@
+-------------------------FarbsensorADJD_S311---------------
+ließt die Farbwerte aus und gibt eine Farbe zurück
+----------------------------------------------------
+benötigt
+I2c.h
+Farbe.h
+----------------------------------------------------
+kreiren eines Objekts:
+Farbsensor();
+Farbsensor(int Led-Pin);
+--------------------------------------------
+gibt die Farbe zurück(siehe README --> Farbe)
+farbeErkennen(); : int
+gibt einen INT-Wert zurück
+

@@ -1,0 +1,9 @@
+-------------------------ULTRASCHALL---------------
+Misst die Distanz mithilfe eines Ultraschallsensors
+----------------------------------------------------
+kreiren eines Objekts:
+Ultraschall(int aEcho-Pin, int aTrigger-Pin);
+----------------------------------------------------
+messen der Distanz:
+getDistanz() : float
+--> gibt einen Kommawert zurück
