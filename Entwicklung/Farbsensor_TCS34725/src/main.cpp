@@ -4,14 +4,13 @@
 
 /*
 FARBEN: ORANGE, GELB, SCHWARZ
-AUTO-Farbsensor
 */
 
 FarbsensorTCS34725 sensor;
 
 void setup() {
   Serial.begin(9600);
-  sensor = FarbsensorTCS34725(0x29, 13, GAIN_4x, INTEG_CYCLE_10);
+  sensor = FarbsensorTCS34725(0x29, 13, WTIME_614, true, GAIN_4x, INTEG_CYCLE_10);
   while(!Serial);
 }
 

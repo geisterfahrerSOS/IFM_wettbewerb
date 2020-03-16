@@ -28,10 +28,10 @@ void Farbe::setColor(byte aRed, byte aGreen, byte aBlue)
     red = aRed;
     green = aGreen;
     blue = aBlue;
-    // Serial.print("RED: "); Serial.println(red);
-    // Serial.print("GREEN: "); Serial.println(green);
-    // Serial.print("BLUE: "); Serial.println(blue);
-    // Serial.println();
+    Serial.print("RED: "); Serial.println(red);
+    Serial.print("GREEN: "); Serial.println(green);
+    Serial.print("BLUE: "); Serial.println(blue);
+    Serial.println();
 };
 //setzt die Farbe mit CLEAR
 void Farbe::setColor(byte aRed, byte aGreen, byte aBlue, byte aClear)
