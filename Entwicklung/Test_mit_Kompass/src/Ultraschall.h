@@ -12,8 +12,8 @@ class Ultraschall
 
     public:
         int echo, trigger;
-        Ultraschall();
         Ultraschall(int aEcho, int aTrigger);
+        Ultraschall();
         float getDistanz();      
 };
 #endif

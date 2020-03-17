@@ -21,10 +21,18 @@
 void radAusgabe(float moveLeft, float moveRight); // -1, 0, 1 pro Rad alles andere wird nicht gewertet
 void measureSteps();
 void ausgleich(int move);
-void getAbweichung();
+int getAbweichung(int targetDir);
 void getSerial();
 void display();
 void radAusgabeBool(int moveLeft, int moveRight); // zwischen -1 und 1
+void geradeausAuto(int time);
+void geradeaus();
+void rechts();
+void links();
+void rueckwaerts();
+void links(int winkel);
+void rechts(int winkel);
+void rueckwaertsAuto(int time);
 
 Winkel kompass;
 LiquidCrystal_I2C lcd = LiquidCrystal_I2C(0x27, 16, 2);
@@ -50,13 +58,12 @@ long delta = 0;
 float schnelle = 0.8;
 
 /////////////////Kompass Steuerung:
-int targetDir = 260;
-int abweichung = 0;
+
+int wiggle = 5;
 
 String inString = ""; // string to hold input
 
 Ultraschall ultraschall;
-
 
 void setup()
 {
@@ -65,7 +72,7 @@ void setup()
   kompass = Winkel();
   kompass.startup();
   Serial.begin(9600);
-  ultraschall = Ultraschall(7,8);
+  ultraschall = Ultraschall(7, 8);
   // put your setup code here, to run once:
   for (int i = 2; i < 7; i++)
   {
@@ -79,18 +86,132 @@ void setup()
 
 void loop()
 {
-  getAbweichung();
-  getSerial();
-  if (abweichung > 0)
-  {
-    radAusgabeBool(1, -1);
-  }
-  else if (abweichung < 0)
-  {
-    radAusgabeBool(-1  , 1);
-  }
+  //geradeausAuto(3000);
+  links(90);
+  delay(1000);
   display();
-  
+}
+
+void geradeausAuto(int time)
+{
+  long momentan = kompass.winkel();
+  long ST1 = millis();
+  long ST2 = 0;
+  int changes = 0;
+  while (millis() - ST1 < time + changes * 20)
+  {
+    if (millis() - ST2 > 20)
+    {
+      // getSerial();
+      if (getAbweichung(momentan) > wiggle)
+      {
+        rechts();
+        changes++;
+      }
+      else if (getAbweichung(momentan) < -wiggle)
+      {
+        links();
+        changes++;
+      }
+      else
+      {
+        geradeaus();
+      }
+      ST2 = millis();
+    }
+  }
+  if (getAbweichung(momentan) > wiggle)
+  {
+    rechts(getAbweichung(momentan));
+    changes++;
+  }
+  else if (getAbweichung(momentan) < -wiggle)
+  {
+    links(getAbweichung(momentan));
+    changes++;
+  }
+  radAusgabeBool(0, 0);
+}
+
+void links(int winkel)
+{
+  long momentan = kompass.winkel();
+  long ziel;
+  if (momentan - winkel < 0)
+  {
+    ziel = 360 + momentan - winkel;
+  }
+  else
+  {
+    ziel = momentan - winkel;
+  }
+  while (ziel + wiggle < (momentan - winkel > 0 ? kompass.winkel() : kompass.winkel() + 360))
+  {
+    Serial.println(kompass.winkel() > 180 ? kompass.winkel() : kompass.winkel() + 360);
+    links();
+  } 
+  Serial.println(kompass.winkel());   
+  radAusgabeBool(0, 0);
+}
+void rechts(int winkel)
+{
+}
+void rueckwaertsAuto(int time)
+{
+  long momentan = kompass.winkel();
+  long ST1 = millis();
+  long ST2 = 0;
+  int changes = 0;
+  while (millis() - ST1 < time + changes * 20)
+  {
+    if (millis() - ST2 > 20)
+    {
+      // getSerial();
+      if (getAbweichung(momentan) > wiggle)
+      {
+        rechts();
+        changes++;
+      }
+      else if (getAbweichung(momentan) < -wiggle)
+      {
+        links();
+        changes++;
+      }
+      else
+      {
+        rueckwaerts();
+      }
+      ST2 = millis();
+    }
+  }
+  if (getAbweichung(momentan) > wiggle)
+  {
+    links(getAbweichung(momentan));
+    changes++;
+  }
+  else if (getAbweichung(momentan) < -wiggle)
+  {
+    rechts(getAbweichung(momentan));
+    changes++;
+  }
+  radAusgabeBool(0, 0);
+}
+
+void geradeaus()
+{
+  radAusgabeBool(1, 1);
+}
+void rechts()
+{
+  radAusgabeBool(1, -1);
+}
+void links()
+{
+  radAusgabeBool(-1, 1);
+}
+void rueckwaerts()
+{
+  radAusgabeBool(-1, -1);
 }
 
 void radAusgabeBool(int moveLeft, int moveRight) // zwischen -1 und 1
@@ -127,6 +248,7 @@ void radAusgabeBool(int moveLeft, int moveRight) // zwischen -1 und 1
     digitalWrite(PR, HIGH);
     digitalWrite(RR, LOW);
   }
+  // ausgleich(moveRight);
 }
 void radAusgabe(float moveLeft, float moveRight) // zwischen -1 und 1
 {
@@ -209,22 +331,20 @@ void ausgleich(int move)
 {
   if (millis() - ST1 < 180)
   {
-    switch (move) //normale Bewegung für 800ms machen
+    if (move == -1)
     {
-    case -1:
       digitalWrite(PR, HIGH);
       digitalWrite(RR, HIGH);
-      break;
-    case 0:
+    }
+    else if (move == 0)
+    {
       digitalWrite(PR, LOW);
       digitalWrite(RR, LOW);
-      break;
-    case 1:
+    }
+    else if (move == 1)
+    {
       digitalWrite(PR, HIGH);
       digitalWrite(RR, LOW);
-      break;
-    default:
-      break;
     }
     ST2 = zeit;
   }
@@ -242,8 +362,9 @@ void ausgleich(int move)
   }
 }
 
-void getAbweichung()
+int getAbweichung(int targetDir)
 {
+  int abweichung = 0;
   if (abs(targetDir - int(kompass.winkel())) <= 180)
   {
     abweichung = targetDir - int(kompass.winkel());
@@ -256,6 +377,7 @@ void getAbweichung()
   {
     abweichung = targetDir - int(kompass.winkel()) + 360;
   }
+  return abweichung;
 }
 void getSerial()
 {
@@ -270,9 +392,9 @@ void getSerial()
     // if you get a newline, print the string, then the string's value:
     if (inChar == '\n')
     {
-      Serial.print("Schnelle:");
-      targetDir = inString.toInt();
-      Serial.println(targetDir);
+      // Serial.print("Schnelle:");
+      // targetDir = inString.toInt();
+      // Serial.println(targetDir);
 
       // clear the string for new input:
       inString = "";
@@ -290,16 +412,16 @@ void display()
     lcd.print("   ");
     lcd.setCursor(8, 0);
     lcd.print("E: ");
-    lcd.print(entfernung);
+    lcd.print(ultraschall.getDistanz());
     lcd.print("   ");
     lcd.setCursor(0, 1);
     lcd.print("K: ");
     lcd.print(int(kompass.winkel()));
     lcd.print("   ");
     lcd.setCursor(8, 1);
-    lcd.print("D:");
-    lcd.print(abweichung);
-    lcd.print("   ");
+    // lcd.print("D:");
+    // lcd.print(abweichung);
+    // lcd.print("   ");
     STDisplayOutput = millis();
   }
 }
