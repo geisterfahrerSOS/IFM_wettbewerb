@@ -50,8 +50,9 @@ long delta = 0;
 float schnelle = 0.8;
 
 /////////////////Kompass Steuerung:
-int targetDir = 260;
+int targetDir = 200;
 int abweichung = 0;
+int wiggle = 10;
 
 String inString = ""; // string to hold input
 
@@ -81,13 +82,30 @@ void loop()
 {
   getAbweichung();
   getSerial();
-  if (abweichung > 0)
+  // if (abweichung > wiggle)
+  // {
+  //   radAusgabeBool(1, -1);
+  // }
+  // else if (abweichung < -wiggle)
+  // {
+  //   radAusgabeBool(-1, 1);
+  // }
+  // else
+  // {
+  //   radAusgabeBool(1, 1);
+  // }
+
+  if (abweichung > wiggle)
   {
-    radAusgabeBool(1, -1);
+    radAusgabeBool(schnelle, -schnelle);
   }
-  else if (abweichung < 0)
+  else if (abweichung < -wiggle)
   {
-    radAusgabeBool(-1  , 1);
+    radAusgabeBool(-schnelle, schnelle);
+  }
+  else
+  {
+    radAusgabeBool(schnelle, schnelle);
   }
   display();
   
@@ -130,7 +148,8 @@ void radAusgabeBool(int moveLeft, int moveRight) // zwischen -1 und 1
 }
 void radAusgabe(float moveLeft, float moveRight) // zwischen -1 und 1
 {
-  analogWrite(PL, int(abs(moveLeft) * 255));
+  //analogWrite(PL, int(abs(moveLeft) * 255));
+  analogWrite(PL, 255);
   if (moveLeft < 0)
   {
     digitalWrite(RL, HIGH);
@@ -144,7 +163,8 @@ void radAusgabe(float moveLeft, float moveRight) // zwischen -1 und 1
     digitalWrite(RL, LOW);
   }
 
-  analogWrite(PR, int(abs(moveRight) * 255));
+  //analogWrite(PR, int(abs(moveRight) * 255));
+  analogWrite(PR, 255);
   if (moveRight < 0)
   {
     digitalWrite(RR, HIGH);
@@ -271,8 +291,8 @@ void getSerial()
     if (inChar == '\n')
     {
       Serial.print("Schnelle:");
-      targetDir = inString.toInt();
-      Serial.println(targetDir);
+      schnelle = inString.toInt()/100.0;
+      Serial.println(schnelle);
 
       // clear the string for new input:
       inString = "";
