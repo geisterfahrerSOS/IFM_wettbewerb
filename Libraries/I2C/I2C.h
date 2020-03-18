@@ -10,6 +10,9 @@ class I2C
     private:
         //speichert die Adresse des Gerätes
         uint8_t address;
+        uint8_t multiplexerAdresse;
+        uint8_t channel;
+        bool activeMultiplexer;
         int LED;
         //if true LED is on
         bool permLED;
@@ -44,5 +47,12 @@ class I2C
         void splitByte(int aVal, byte *aLo, byte *aHi);
         //bestimmt, ob LED ausgeschaltet werden kann
         void setPermLED(bool aPermLED);
+        //setzt den multiplexer
+        void setMultiplexer(uint8_t add, uint8_t aChannel);
+        //"löscht" den multiplexer
+        void clearMultiplexer();
+        //wechselt zu den richtigen Kanal
+        int switchChannel();
+
 };
 #endif
