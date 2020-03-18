@@ -6,6 +6,7 @@
 #include <I2C.h>
 #include <Farbe.h>
 
+#define ADDRESS 0x29
 #define COMMAND_BIT 0x80 // Typ der Übertragung
 
 #define ENABLE 0b00 //REG: aktiviert Interupts und Staten
@@ -59,9 +60,13 @@ class FarbsensorTCS34725
         //Konstruktor
         FarbsensorTCS34725();
         //Konstruktor - für Einmalmessung
-        FarbsensorTCS34725(uint8_t aAdd, int aLed, uint8_t aAGain, uint8_t aIntegCycle);
+        FarbsensorTCS34725(int aLed, uint8_t aAGain, uint8_t aIntegCycle);
+        //mit Multiplexer
+        FarbsensorTCS34725(uint8_t mulitAdd, uint8_t channel, int aLed, uint8_t aAGain, uint8_t aIntegCycle);
         //Konstrukor für Messung nach delay(wTime)
-        FarbsensorTCS34725(uint8_t aAdd, int aLed, uint8_t aWTime, bool aWLong, uint8_t aAGain, uint8_t aIntegCycle);
+        FarbsensorTCS34725(int aLed, uint8_t aWTime, bool aWLong, uint8_t aAGain, uint8_t aIntegCycle, bool active);
+        //mit Multiplexer
+        FarbsensorTCS34725(uint8_t mulitAdd, uint8_t channel, int aLed, uint8_t aWTime, bool aWLong, uint8_t aAGain, uint8_t aIntegCycle, bool active);
         //setzt den Integraion Cycle
         void setIntegCycle(uint8_t aIntegCycle);
         //setzt den Gain

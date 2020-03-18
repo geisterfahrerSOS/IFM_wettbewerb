@@ -52,3 +52,12 @@ void splitByte(int aVal, byte *aLo, byte *aHi);
 
 bestimmt, ob LED ausgeschaltet werden kann oder permanent an ist
 void setPermLED(bool aPermLED);
+
+setzt den Multiplexer
+setMultiplexer(uint8_t add, uint8_t aChannel);
+
+deaktiviert den Multiplexer
+clearMultiplexer();
+
+wechselt zu dem Ausgewählten Kanal
+switchChannel();

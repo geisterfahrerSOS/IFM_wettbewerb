@@ -182,3 +182,29 @@ void I2C::setPermLED(bool aPermLED)
 {
     permLED = aPermLED;
 };
+void I2C::setMultiplexer(uint8_t add, uint8_t aChannel)
+{
+    if(aChannel > 7)
+    {
+        Serial.print("Channel ist zu groß: "); Serial.println(aChannel); 
+        return;
+    }
+    multiplexerAdresse = add;
+    channel = aChannel;
+    activeMultiplexer = true;
+};
+void I2C::clearMultiplexer()
+{
+    activeMultiplexer = false;
+};
+int I2C::switchChannel()
+{
+    if(!activeMultiplexer)
+    {
+        return 4;
+    }
+    
+    Wire.beginTransmission(multiplexerAdresse);
+    Wire.write(1 << channel);
+    return Wire.endTransmission();
+};
