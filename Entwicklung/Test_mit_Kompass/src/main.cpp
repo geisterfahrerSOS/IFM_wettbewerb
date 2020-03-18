@@ -147,7 +147,7 @@ void links(int winkel)
   }
   while (ziel + wiggle < (momentan - winkel > 0 ? kompass.winkel() : kompass.winkel() + 360))
   {
-    Serial.println(kompass.winkel() > 180 ? kompass.winkel() : kompass.winkel() + 360);
+    Serial.println(momentan - winkel > 0 ? kompass.winkel() : kompass.winkel() + 360);
     links();
   } 
   Serial.println(kompass.winkel());   
