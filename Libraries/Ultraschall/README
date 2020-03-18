@@ -7,3 +7,5 @@ Ultraschall(int aEcho-Pin, int aTrigger-Pin);
 messen der Distanz:
 getDistanz() : float
 --> gibt einen Kommawert zurück
+
+ULTRASCHALL bei nähe nicht ganz genau

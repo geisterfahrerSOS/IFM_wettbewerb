@@ -17,27 +17,28 @@ float Ultraschall::getDistanz()
   delayMicroseconds(20);
   digitalWrite(trigger, LOW);
   unsigned long stamp = millis();
-  while(digitalRead(echo) == LOW || stamp + 10 > millis())
+  while(digitalRead(echo) == LOW && stamp + 50 > millis())
   {
     //Warten auf HIGH
 	  Serial.println(1);
   }
-  if(stamp + 10 > millis())
+  if(stamp + 10 < millis())
   {
 	  return distance;
   }
-  stamp = millis();
+  unsigned long stamp2 = millis();
   unsigned long timeStampGo = micros();
-  while(digitalRead(echo) == HIGH || stamp + 10 > millis())
+  while(digitalRead(echo) == HIGH && stamp2 + 50 > millis())
   {
     //Warten auf LOW
 	  Serial.println(2);
   }
-  if(stamp + 10 > millis())
+  Serial.println();
+  if(stamp + 10 < millis())
   {
 	  return distance;
   }
   distance = micros() - timeStampGo;
-  distance = distance / 58;  
+  distance = distance / 58 - 1;  
   return distance;
 };
