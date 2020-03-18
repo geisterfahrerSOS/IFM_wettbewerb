@@ -1,0 +1,54 @@
+---------------FarbsensorTCS34725---------------
+ließt die Farbwerte aus und gibt eine Farbe zurück
+----------------------------------------------------
+benötigt
+I2C.h
+Farbe.h
+----------------------------------------------------
+kreiren eines Objekts:
+FarbsensorTCS34725()
+FarbsensorTCS34725(uint8_t address, int aLed-Pin, uint8_t AGain, uint8_t IntegCycle);
+//aktiviert Intervallmessung
+FarbsensorTCS34725(uint8_t address, int aLed-Pin, uint8_t WTime, bool WLong, uint8_t AGain, uint8_t IntegCycle);
+
+//mit Multiplexer
+FarbsensorTCS34725(uint8_t mulitAdd, uint8_t channel, int aLed, uint8_t aAGain, uint8_t aIntegCycle);
+FarbsensorTCS34725(uint8_t mulitAdd, uint8_t channel, int aLed, uint8_t aWTime, bool aWLong, uint8_t aAGain, uint8_t aIntegCycle);
+
+bei 
+WTime, AGAIN, IntegCycle
+nur die vorgegebenen DEFINES nutzen
+--------------------------------------------------
+gibt die Farbe zurück(siehe README --> Farbe)
+farbeErkennen() : int
+gibt einen INT-Wert zurück
+
+aktiviert den Sensor
+start();
+
+deaktiviert den Sensor
+stop();
+
+Setzt den IntegrationCycle
+setIntegCycle(uint8_t aIntegCycle);
+
+setzt den Gain
+void setAGain(uint8_t aAGain);
+
+setzt die Wartezeit
+setWTime(uint8_t AWTime);
+
+setzt, ob die wartezeit 12x so hoch ist
+setWLong(bool aWLong);
+
+setzt, ob die Wartefunktion aktiviert wird
+setWen(bool aWen);
+
+Setzt, ob die Farberkennung aktiv ist
+setAEN(bool aAen);
+
+setzt, ob die Wartefunktion aktiviert wird und setzt eine zeit
+setWen(bool aWen, uint8_t aWTime);
+
+Setzt, ob der Sensor in dem SLEEP- oder IDLE-Modus ist
+setPon(bool aPon);

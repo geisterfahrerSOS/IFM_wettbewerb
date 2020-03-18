@@ -1,5 +1,6 @@
 #include <FarbsensorADJD_S311.h>
 //definiert die Register
+#define ADDRESS 0x74
 #define CTRL 0x00
 #define CONFIG 0x01
 
@@ -35,7 +36,7 @@ Farbsensor::Farbsensor(int aLed)
     //kreirt ein Objekt Farbe
     color = Farbe();
     //setzt die Addresse des Farbsensors
-    i2c = I2C(0x74, aLed);
+    i2c = I2C(ADDRESS, aLed);
 
     //setzt die Werte zur Messung
     i2c.chipWrite(0x0E, CAP_RED); // 0x08
