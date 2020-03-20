@@ -87,11 +87,101 @@ void setup()
 void loop()
 {
   //geradeausAuto(3000);
-  links(90);
+  drehen(20);
   delay(1000);
   display();
 }
-
+void drehen(int winkel) // negative Werte bedeuten links und positive bedeuten rechts
+{
+  long momentan = kompass.winkel();
+  long ziel = 0;
+  if (momentan + winkel < 0)// angenommen winkel = -40 momentan = 20 dann Ziel = 340
+  {
+    ziel = 360 + momentan + winkel;//340
+    while(kompass.winkel()>0)
+    {
+      left();
+    }
+    while(kompass.winkel()>ziel)
+    {
+      left();
+    }
+    /*
+    while (kompass.winkel() + winkel - momentan > wiggle)
+    {
+      left();
+    }
+    while (kompass.winkel() + winkel - momentan < -wiggle)
+    {
+      right();
+    }
+    */
+  }
+  else if (momentan + winkel > 360)
+  {
+    ziel = momentan + winkel - 360;
+    while(kompass.winkel()<360)
+    {
+      right();
+    }
+    while(kompass.winkel()<ziel)
+    {
+      right();
+    }
+    /*
+    while (kompass.winkel() - (momentan + winkel - 360) < -wiggle)
+    {
+      right();
+    }
+    while (kompass.winkel() - (momentan + winkel - 360) > wiggle)
+    {
+      left();
+    }
+    */
+  }
+  else
+  {
+    ziel = momentan + winkel;
+    if (winkel > 0)
+    {
+      while (kompass.winkel() < ziel)
+      {
+        right();
+      }
+    }
+    else
+    {
+      while (kompass.winkel() > ziel)
+      {
+        left();
+      }
+    }
+  }
+  radAusgabeBool(0, 0);
+}
+void links(int winkel)
+{
+  long momentan = kompass.winkel();
+  long ziel;
+  if (momentan - winkel < 0)
+  {
+    ziel = 360 + momentan - winkel;
+  }
+  else
+  {
+    ziel = momentan - winkel;
+  }
+  while (ziel + wiggle < (momentan - winkel > 0 ? kompass.winkel() : kompass.winkel() + 360))
+  {
+    Serial.println(momentan - winkel > 0 ? kompass.winkel() : kompass.winkel() + 360);
+    links();
+  }
+  Serial.println(kompass.winkel());
+  radAusgabeBool(0, 0);
+}
+void rechts(int winkel)
+{
+}
 void geradeausAuto(int time)
 {
   long momentan = kompass.winkel();
@@ -131,30 +221,6 @@ void geradeausAuto(int time)
     changes++;
   }
   radAusgabeBool(0, 0);
-}
-
-void links(int winkel)
-{
-  long momentan = kompass.winkel();
-  long ziel;
-  if (momentan - winkel < 0)
-  {
-    ziel = 360 + momentan - winkel;
-  }
-  else
-  {
-    ziel = momentan - winkel;
-  }
-  while (ziel + wiggle < (momentan - winkel > 0 ? kompass.winkel() : kompass.winkel() + 360))
-  {
-    Serial.println(momentan - winkel > 0 ? kompass.winkel() : kompass.winkel() + 360);
-    links();
-  } 
-  Serial.println(kompass.winkel());   
-  radAusgabeBool(0, 0);
-}
-void rechts(int winkel)
-{
 }
 void rueckwaertsAuto(int time)
 {
@@ -196,7 +262,6 @@ void rueckwaertsAuto(int time)
   }
   radAusgabeBool(0, 0);
 }
-
 void geradeaus()
 {
   radAusgabeBool(1, 1);
@@ -213,7 +278,6 @@ void rueckwaerts()
 {
   radAusgabeBool(-1, -1);
 }
-
 void radAusgabeBool(int moveLeft, int moveRight) // zwischen -1 und 1
 {
 
@@ -300,7 +364,6 @@ void radAusgabe(float moveLeft, float moveRight) // zwischen -1 und 1
   //ausgleich(moveRight);
   */
 }
-
 void measureSteps()
 {
   befL = digitalRead(ML);
@@ -361,7 +424,6 @@ void ausgleich(int move)
     }
   }
 }
-
 int getAbweichung(int targetDir)
 {
   int abweichung = 0;
@@ -401,7 +463,6 @@ void getSerial()
     }
   }
 }
-
 void display()
 {
   if (millis() - STDisplayOutput > 200)

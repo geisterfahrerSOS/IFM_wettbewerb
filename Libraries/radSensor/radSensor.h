@@ -13,7 +13,7 @@ class RadSensor
         //gibt dn Wert 0-1023 des Analogen Pins zurück
         int getData(boolean debug);
     	//gibt die Umdrehungen des Rades zurück??
-        void stepRead();
+        long stepRead();
         //gibt die Strecke Zurück
         long umwandlungSteps();
 
