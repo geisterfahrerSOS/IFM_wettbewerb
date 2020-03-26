@@ -1,0 +1,76 @@
+//Weiß
+    if(differenceRG > 0.9 && differenceRG < 1.1
+        && differenceRB > 0.9 && differenceRB < 1.1
+        && differenceGB > 0.9 && differenceGB < 1.1
+        && red > 127//&& red < 
+        && green > 127//&& green < 
+        && blue > 127//&& blue <
+    )
+    {
+        color = 7;
+    }
+    //schwarz
+    else if(differenceRG > 0.9 && differenceRG < 1.1
+        && differenceRB > 0.9 && differenceRB < 1.1
+        && differenceGB > 0.9 && differenceGB < 1.1 
+        /*&& red > */&& red < 127
+        /*&& green > */&& green < 127
+        /*&& blue > */&& blue < 127
+    )
+    {
+        color = 6;
+    }
+    //Gelb
+    else if(differenceRG > 0.95 && differenceRG < 1.1
+        && differenceRB > 1.35 && differenceRB < 1.5
+        && differenceGB > 1.35 && differenceGB < 1.55 
+        && red > 90//&& red < 
+        && green > 90//&& green < 
+        && blue > 90//&& blue < 
+    )
+    {
+        color = 2;
+    }
+    //Orange
+    else if(differenceRG > 1.2 && differenceRG < 1.35
+        && differenceRB > 1.5 && differenceRB < 1.7
+        && differenceGB > 1.1 && differenceGB < 1.35 
+        && red > 60//&& red < 
+        && green > 60//&& green < 
+        && blue > 60//&& blue < 
+    )
+    {
+        color = 1;
+    }
+    //Rot
+    else if(red > green && red > blue
+        /*&& red > *///&& red < 100
+        /*&& green > *///&& green < 100
+        /*&& blue > *///&& blue < 100
+    )
+    {
+        color = 5;
+    }
+    //Grün
+    else if(green > red && green > blue
+        /*&& red > *///&& red < 100
+        /*&& green > *///&& green < 100
+        /*&& blue > *///&& blue < 100
+    )
+    {
+        color = 3;
+    }
+    //BLAU
+    else if(blue > green && blue > red
+        //&& red > 50//&& red < 100
+        //&& green > 50//&& green < 100
+        //&& blue > 50//&& blue < 100
+    )
+    {
+        color = 4;
+    }  
+    //keine der obigen Farben
+    else
+    {
+        color = -1;
+    } 
