@@ -25,18 +25,18 @@ FarbsensorTCS34725::FarbsensorTCS34725(int aLed, uint8_t aAGain, uint8_t aIntegC
     setWen(false);
     //Sensor hochfahren
 };
-FarbsensorTCS34725::FarbsensorTCS34725(uint8_t mulitAdd, uint8_t channel, int aLed, uint8_t aAGain, uint8_t aIntegCycle)
+FarbsensorTCS34725::FarbsensorTCS34725(FS_Param_multiAdd_t pParameter)
 {
     //I2C-Verbindung aufbauen
-    i2c = I2C(ADDRESS, aLed, false);
-    i2c.setMultiplexer(mulitAdd, channel);
+    i2c = I2C(ADDRESS, pParameter.aLed, false);
+    i2c.setMultiplexer(pParameter.mulitAdd, pParameter.channel);
     i2c.switchChannel();
     //Sensor hochfahren
     start();
     //Gain setzen
-    setAGain(aAGain);
+    setAGain(pParameter.aAGain);
     //Integration Time setzen 
-    setIntegCycle(aIntegCycle);
+    setIntegCycle(pParameter.aIntegCycle);
     //Wait time setzen(minimum)
     setWTime(WTIME_2_4);
     //12x wTime nicht aktiv 
@@ -46,7 +46,29 @@ FarbsensorTCS34725::FarbsensorTCS34725(uint8_t mulitAdd, uint8_t channel, int aL
     //Wartezeit-funktion aus
     setWen(false);
 };
-FarbsensorTCS34725::FarbsensorTCS34725(uint8_t mulitAdd, uint8_t channel, int aLed, uint8_t aWTime, bool aWLong, uint8_t aAGain, uint8_t aIntegCycle, bool active)
+//Konstrukor für Messung nach delay(wTime)
+FarbsensorTCS34725::FarbsensorTCS34725(FS_Param_singleAdd_t pParameter)
+{
+    //I2C-Verbindung aufbauen
+    i2c = I2C(ADDRESS, pParameter.aLed, true);
+    //Sensor hochfahren
+    start();
+    //Gain setzen
+    setAGain(pParameter.aAGain);
+    //Integration Time setzen 
+    setIntegCycle(pParameter.aIntegCycle);
+    //Wait time setzen
+    setWTime(pParameter.aWTime);
+    //Wartezeit-funktion ein
+    setWen(true);
+    //Farberkennung
+    setAEN(true);
+    //Idle-Modus
+    //setPon(true);
+    //12x wTime
+    setWLong(pParameter.aWLong);
+};
+FarbsensorTCS34725::FarbsensorTCS34725(uint8_t mulitAdd, uint8_t channel, int aLed, uint8_t aWTime, bool aWLong, uint8_t aAGain, uint8_t aIntegCycle)
 {
     //I2C-Verbindung aufbauen
     i2c = I2C(ADDRESS, aLed, true);
@@ -68,36 +90,6 @@ FarbsensorTCS34725::FarbsensorTCS34725(uint8_t mulitAdd, uint8_t channel, int aL
     //setPon(true);
     //12x wTime
     setWLong(aWLong);
-    if(!active)
-    {
-        stop();
-    }
-};
-//Konstrukor für Messung nach delay(wTime)
-FarbsensorTCS34725::FarbsensorTCS34725(int aLed, uint8_t aWTime, bool aWLong, uint8_t aAGain, uint8_t aIntegCycle, bool active)
-{
-    //I2C-Verbindung aufbauen
-    i2c = I2C(ADDRESS, aLed, true);
-    //Sensor hochfahren
-    start();
-    //Gain setzen
-    setAGain(aAGain);
-    //Integration Time setzen 
-    setIntegCycle(aIntegCycle);
-    //Wait time setzen
-    setWTime(aWTime);
-    //Wartezeit-funktion ein
-    setWen(true);
-    //Farberkennung
-    setAEN(true);
-    //Idle-Modus
-    //setPon(true);
-    //12x wTime
-    setWLong(aWLong);
-    if(!active)
-    {
-        stop();
-    }
 };
 //setzt den Sensor in den IDLE-Modus
 void FarbsensorTCS34725::start()

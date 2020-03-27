@@ -54,19 +54,37 @@
 /*
     Libary für den Farbsensor TCS34725
 */
+typedef struct FS_Param_multiAdd_type
+{
+    uint8_t mulitAdd;
+    uint8_t channel;
+    int aLed;
+    uint8_t aAGain;
+    uint8_t aIntegCycle;
+} FS_Param_multiAdd_t;
+typedef struct FS_Param_singleAdd_type
+{
+    int aLed;
+    uint8_t aWTime;
+    bool aWLong;
+    uint8_t aAGain;
+    uint8_t aIntegCycle;
+} FS_Param_singleAdd_t;
 class FarbsensorTCS34725
 {
     public:
-        //Konstruktor
         FarbsensorTCS34725();
         //Konstruktor - für Einmalmessung
         FarbsensorTCS34725(int aLed, uint8_t aAGain, uint8_t aIntegCycle);
         //mit Multiplexer
-        FarbsensorTCS34725(uint8_t mulitAdd, uint8_t channel, int aLed, uint8_t aAGain, uint8_t aIntegCycle);
+        FarbsensorTCS34725(FS_Param_multiAdd_t pParameter);
         //Konstrukor für Messung nach delay(wTime)
-        FarbsensorTCS34725(int aLed, uint8_t aWTime, bool aWLong, uint8_t aAGain, uint8_t aIntegCycle, bool active);
+        FarbsensorTCS34725(FS_Param_singleAdd_t pParameter);
         //mit Multiplexer
-        FarbsensorTCS34725(uint8_t mulitAdd, uint8_t channel, int aLed, uint8_t aWTime, bool aWLong, uint8_t aAGain, uint8_t aIntegCycle, bool active);
+        FarbsensorTCS34725(uint8_t mulitAdd, uint8_t channel, int aLed, uint8_t aWTime, bool aWLong, 
+                            uint8_t aAGain, uint8_t aIntegCycle);
+        
+        
         //setzt den Integraion Cycle
         void setIntegCycle(uint8_t aIntegCycle);
         //setzt den Gain

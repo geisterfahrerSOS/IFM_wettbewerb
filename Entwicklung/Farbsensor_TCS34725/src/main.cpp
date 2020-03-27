@@ -10,7 +10,15 @@ FarbsensorTCS34725 sensor;
 
 void setup() {
   Serial.begin(9600);
-  sensor = FarbsensorTCS34725(MULTIPLEXER, 6, 13, GAIN_4x, INTEG_CYCLE_10);
+  
+  FS_Param_multiAdd_t parameter;
+  parameter.mulitAdd = 0x70;
+  parameter.channel = 6;
+  parameter.aLed = 13;
+  parameter.aAGain = GAIN_4x;
+  parameter.aIntegCycle = INTEG_CYCLE_10;
+
+  sensor = FarbsensorTCS34725(parameter);
   while(!Serial);
 }
 
