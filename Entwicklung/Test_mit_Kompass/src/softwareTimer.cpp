@@ -4,25 +4,26 @@ int actionArray[10];
 
 #define HALLO 0
 #define BYE 1
+
 //1 Cycle -> 2 ms
 
 int time1;
 int time2;
 
-
-/******************************************************/
 long timeStamp;
 long timeStampNew;
+
 void setup()
 {
   Serial.begin(9600);
+  /******************************************************/
   noInterrupts();
-  TCCR2A=(1<<WGM21);    //Set the CTC mode   
-  OCR2A=249; //Value for ORC0A for 1ms
+  TCCR2A=(1<<WGM21);    //Interuptmodus setzen -> Compare  
+  OCR2A=249; //2ms pro Intervall
  
-  TIMSK2|=(1<<OCIE2A);   //Set the interrupt reques
+  TIMSK2|=(1<<OCIE2A);
  
-  TCCR2B|=(0<<CS21);    //Set the prescale 1/64 clock
+  TCCR2B|=(0<<CS21);    //Presqale 1 : 8
   TCCR2B|=(1<<CS20);
   interrupts();  
   
@@ -38,14 +39,14 @@ void loop()
 {
   if(actionArray[HALLO] == 1)
   {
-     
      actionArray[HALLO] = 0;
      Serial.print("HALLO :");
      timeStampNew = millis();
      Serial.print(timeStampNew - timeStamp);
      Serial.println(" ms");
      timeStamp = timeStampNew;
-     timerArray[1] = time2;
+
+     timerArray[BYE] = time2;
   }
   if(actionArray[BYE] == 1)
   {
@@ -56,10 +57,11 @@ void loop()
     Serial.println(" ms");
     timeStamp = timeStampNew;
     Serial.println();
-    timerArray[0] = time1;
+    timerArray[HALLO] = time1;
   }
 }
 
+/******************************************************/
 ISR(TIMER2_COMPA_vect)
 {
   for(int i = 0; i < swTimerLength; i++)
@@ -74,3 +76,4 @@ ISR(TIMER2_COMPA_vect)
     }
   }
 }
+/******************************************************/
