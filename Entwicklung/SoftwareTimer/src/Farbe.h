@@ -1,6 +1,14 @@
 #ifndef Farbe_h
 #define Farbe_h
 #include <Arduino.h>
+#define ORANGE 1
+#define GELB 2
+#define GRUEN 3
+#define BLAU 4
+#define ROT 5
+#define SCHWARZ 6
+#define GRAU 7
+#define WEISS 8
 /*
     Enthält Farbwerte, git Farben aus
 */
