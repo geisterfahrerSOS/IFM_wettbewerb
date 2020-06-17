@@ -235,6 +235,7 @@ void loop()
     timerArray[SENSOREN] = 10;
   }
 
+/*
   if (actionArray[NAHESTEDISTANZ] = 1)
   {
     switch (step)
@@ -292,7 +293,7 @@ void loop()
       timerArray[NAHEDATAEINTRAG] = 50;
     }
   }
-
+*/
   if (actionArray[ULTRASCHALL] == 1)
   {
 
@@ -364,7 +365,7 @@ void loop()
     //sollte die Funtion neu aufgerufen werden, so wird der zielwinkel gesetzt
     if (neugestartetDrehen)
     {
-      richtung = winkelKompass1 + winkel; //Ziel des winkels
+      richtung = gyroData + winkel; //Ziel des winkels
       if (richtung < 0)
       {
         richtung += 360;
@@ -384,7 +385,7 @@ void loop()
       switch (overflow)
       {
       case -1:
-        if ((winkelKompass1 >= 0) && (winkelKompass1 < richtung) || winkelKompass1 > richtung + wiggleWinkel)
+        if ((gyroData >= 0) && (gyroData < richtung) || gyroData > richtung + wiggleWinkel)
         {
           links();
         }
@@ -396,7 +397,7 @@ void loop()
       case 0:
         if (winkel > 0)
         {
-          if (winkelKompass1 < richtung)
+          if (gyroData < richtung)
           {
             rechts();
           }
@@ -407,7 +408,7 @@ void loop()
         }
         else
         {
-          if (winkelKompass1 > richtung)
+          if (gyroData > richtung)
           {
             links();
           }
@@ -418,7 +419,7 @@ void loop()
         }
         break;
       case 1:
-        if ((winkelKompass1 <= 360) && (winkelKompass1 > richtung) || winkelKompass1 < richtung - wiggleWinkel)
+        if ((gyroData <= 360) && (gyroData > richtung) || gyroData < richtung - wiggleWinkel)
         {
           rechts();
         }
@@ -430,7 +431,7 @@ void loop()
       default:
         if (winkel > 0)
         {
-          if (winkelKompass1 < richtung)
+          if (gyroData < richtung)
           {
             rechts();
           }
@@ -441,7 +442,7 @@ void loop()
         }
         else
         {
-          if (winkelKompass1 > richtung)
+          if (gyroData > richtung)
           {
             links();
           }
@@ -588,6 +589,9 @@ void actionManager()
   kompass11.state = false;
   switch (actionIndex)
   {
+    case 0:
+      actionArray[DREHEN] = 1;
+      winkel = 90;
     // case 0:
     //   actionArray[GERADEAUSFAHREN] = 1;
     //   korrigieren = true;
@@ -608,10 +612,6 @@ void actionManager()
     //case 4:
     //  actionArray[FARBEFAHREN] = 1;
     //  farbe = 1;
-    //case 5:
-    //  actionArray[NAEHSTEDISTANZ] = 1
-    //  winkelVerschiebung = 30;
-    //case 6:
     //step++;
   }
 }
